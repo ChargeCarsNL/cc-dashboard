@@ -33,8 +33,6 @@ window.addEventListener('load', function () {
             return;
         }
 
-        console.log("Testbericht 2");
-
         placeTextInHeader(data);
 
         const verstuurdeWerkbonnenArray = extractVerstuurdeWerkbonnenArray(data);
@@ -114,7 +112,7 @@ window.addEventListener('load', function () {
         );
 
         if (!verstuurdeWerkbonnenField || !verstuurdeWerkbonnenField.value) {
-            console.error('verstuurdeWerkbonnenArray data is missing or improperly formatted.');
+            console.error('verstuurdeWerkbonnenArray data is missing or improperly formatted. Lul');
             return [];
         }
 
