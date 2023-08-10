@@ -13,6 +13,15 @@ window.addEventListener('load', function () {
     const demontageWerkbonId = "92562e08-682c-41c8-b656-67e1b467ca1c";
     const schouwingWerkbonId = "3427c7d5-a12c-48ed-8114-55fe7af0ddfd";
 
+    const werkbonnenArray = [
+        lmraWerkbonId,
+        installatieWerkbonId,
+        groepenkastWerkbonId,
+        serviceWerkbonId,
+        demontageWerkbonId,
+        schouwingWerkbonId
+    ];
+
     // Fetch data from ClickUp API
     fetch(url, {
         method: 'POST',
@@ -39,28 +48,36 @@ window.addEventListener('load', function () {
 
         const werkbonnenBenodigd = getWerkbonnenBenodigd(data);
 
-        werkbonnenBenodigd.forEach(id => {
-            const sectionElement = document.getElementById(`section${id}`);
-
-            if (sectionElement) {
-                updateChildElements(id, verstuurdeWerkbonnenArray, sectionElement);
-            }
+        // display buttons based on requirements
+        werkbonnenArray.forEach(id => {
+            updateChildElements(id, verstuurdeWerkbonnenArray, werkbonnenBenodigd);
         });
 
+        // hide lmra if not required
+        const lmraSection = document.getElementById("section39ce6e14-6b51-42f9-80bd-10ff8b74bd1e");
+
+        if (werkbonnenBenodigd.includes(lmraWerkbonId)) {
+            lmraSection.style.display = 'flex';
+            console.log("truetrue");
+        };
+
         checkWerkbonnenCompleteness(werkbonnenBenodigd, verstuurdeWerkbonnenArray);
+
+        const loadingFrame = document.getElementById("loadingFrame");
+        loadingFrame.style.display = "none";
     }
 
     // Functie die controleert of alle werkbonnen zijn ingevuld
     function checkWerkbonnenCompleteness(werkbonnenBenodigd, verstuurdeWerkbonnenArray) {
         const isWerkbonnenComplete = arraysAreEqual(werkbonnenBenodigd, verstuurdeWerkbonnenArray);
-    
+
         const trueCompleteElement = document.getElementById("truecomplete");
         const falseCompleteElement = document.getElementById("falsecomplete");
-    
+
         if (trueCompleteElement) {
             trueCompleteElement.style.display = isWerkbonnenComplete ? 'flex' : 'none';
             falseCompleteElement.style.display = isWerkbonnenComplete ? 'none' : 'flex';
-        } else {
+        } else if (falseCompleteElement) {
             trueCompleteElement.style.display = isWerkbonnenComplete ? 'none' : 'flex';
             falseCompleteElement.style.display = isWerkbonnenComplete ? 'flex' : 'none';
         }
@@ -71,48 +88,50 @@ window.addEventListener('load', function () {
         if (array1.length !== array2.length) {
             return false;
         }
-    
+
         for (let i = 0; i < array1.length; i++) {
             if (!array2.includes(array1[i])) {
                 return false;
             }
         }
-    
-        return true;
-    }    
 
+        return true;
+    }
+
+    // display jobinfo in header function
     function placeTextInHeader(data) {
         const soortKlusName = getDropdownOptionByValue('5e386287-7885-43f6-9dc5-ff494cec5be4', data).name;
         const jobName = data.name;
-    
+
         const jobInfoHeader = document.getElementById("job-info-header");
         jobInfoHeader.innerHTML = ""; // Clear existing content
-    
+
         const jobnameNode = document.createTextNode(jobName);
         const soortKlusNode = document.createTextNode(soortKlusName);
-    
+
         // Create div elements for styling
         const jobnameDiv = document.createElement("div");
         jobnameDiv.appendChild(jobnameNode);
         jobnameDiv.style.width = "100%";
-    
+
         const soortKlusDiv = document.createElement("div");
         soortKlusDiv.appendChild(soortKlusNode);
         soortKlusDiv.style.width = "100%";
         soortKlusDiv.style.fontWeight = "bold";
-    
+
         // Append the div elements to the header
         jobInfoHeader.appendChild(jobnameDiv);
         jobInfoHeader.appendChild(soortKlusDiv);
     }
 
+    // Get filled workorders from clickup custom tag field
     function extractVerstuurdeWerkbonnenArray(data) {
         const verstuurdeWerkbonnenField = data.custom_fields.find(
             field => field.id === 'f3245e18-c65b-41c3-85e3-da7c58c16e2d'
         );
 
         if (!verstuurdeWerkbonnenField || !verstuurdeWerkbonnenField.value) {
-            console.error('verstuurdeWerkbonnenArray data is missing or improperly formatted. Lullig');
+            console.error('verstuurdeWerkbonnenArray data is missing or improperly formatted.');
             return [];
         }
 
@@ -146,15 +165,20 @@ window.addEventListener('load', function () {
         }
     }
 
-    function updateChildElements(id, verstuurdeWerkbonnenArray, sectionElement) {
+    function updateChildElements(id, verstuurdeWerkbonnenArray, werkbonnenBenodigd) {
         const trueChild = document.getElementById(`true${id}`);
         const falseChild = document.getElementById(`false${id}`);
 
-        const shouldShowTrueChild = verstuurdeWerkbonnenArray.includes(id);
+        const isRequired = werkbonnenBenodigd.includes(id);
+        const isFilled = verstuurdeWerkbonnenArray.includes(id);
 
-        trueChild.style.display = shouldShowTrueChild ? 'flex' : 'none';
-        falseChild.style.display = shouldShowTrueChild ? 'none' : 'flex';
-        sectionElement.style.display = 'flex';
+        if (isRequired) {
+            trueChild.style.display = isFilled ? 'flex' : 'none';
+            falseChild.style.display = isFilled ? 'none' : 'flex';
+        } else {
+            trueChild.style.display = "none";
+            falseChild.style.display = "none";
+        }
     }
 
     function getDropdownOptionByValue(customFieldId, data) {
