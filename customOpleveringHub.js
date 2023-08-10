@@ -33,7 +33,7 @@ window.addEventListener('load', function () {
             return;
         }
 
-
+        console.log("Testbericht 2");
 
         placeTextInHeader(data);
 
