@@ -1,11 +1,11 @@
 window.addEventListener('load', function () {
     const apiKey = '15c34515-3bfb-47fb-9a4c-b39de6822ca5';
-    const taskID = new URLSearchParams(window.location.search).get('taskid');
+    const taskId = new URLSearchParams(window.location.search).get('taskid');
 
     const url =
         'https://prod-86.westeurope.logic.azure.com:443/workflows/597c6ec246244650b9b4aab8bd45e87a/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=FJHndl9oqnpIvHeUDQ615IK26SKzEePM8-b7hXrFrh8';
 
-    // Declare werkbonsoorten with ids
+    // Declare werkbonsoorten with ids and create Werkbon id array
     const lmraWerkbonId = "39ce6e14-6b51-42f9-80bd-10ff8b74bd1e";
     const installatieWerkbonId = "8c0c0d66-cac9-4bbe-b460-ed12b8d8dda1";
     const groepenkastWerkbonId = "35616272-f1f3-4a26-9eef-780b386f737e";
@@ -29,7 +29,7 @@ window.addEventListener('load', function () {
             'Content-Type': 'application/json',
             'Api-Key': apiKey,
         },
-        body: JSON.stringify({ taskId: taskID }),
+        body: JSON.stringify({ taskId: taskId }),
     })
         .then(response => response.json())
         .then(data => handleData(data))
@@ -42,7 +42,20 @@ window.addEventListener('load', function () {
             return;
         }
 
-        placeTextInHeader(data);
+        // Create job object
+        const jobObj = {
+            "taskId": data.id,
+            "customTaskId": data.custom_id,
+            "jobName": data.name,
+            "opdRef": getCustomFieldObject(data, '97d824e2-abdc-4adc-a5f3-4dd748fc6234').value,
+            "opdrachtgeverId": data.list.id,
+            "opdrachtgeverName": data.list.name,
+            "naamKlant": getCustomFieldObject(data, '6a3fc1d2-565c-4c23-9b07-cd010c9f682a').value + " " + getCustomFieldObject(data, '30db299f-c3e4-406a-ab46-7ea763648799').value,
+            "soortKlus": getDropdownOptionByValue(data, '5e386287-7885-43f6-9dc5-ff494cec5be4').name,
+            "adres": getCustomFieldObject(data, 'd37d5497-3113-4851-9c4e-49c2c151ed3d').value.formatted_address
+        };
+
+        placeTextInHeader(jobObj);
 
         const verstuurdeWerkbonnenArray = extractVerstuurdeWerkbonnenArray(data);
 
@@ -51,6 +64,7 @@ window.addEventListener('load', function () {
         // display buttons based on requirements
         werkbonnenArray.forEach(id => {
             updateChildElements(id, verstuurdeWerkbonnenArray, werkbonnenBenodigd);
+            addHrefToElement(id, jobObj);
         });
 
         // hide lmra if not required
@@ -58,7 +72,6 @@ window.addEventListener('load', function () {
 
         if (werkbonnenBenodigd.includes(lmraWerkbonId)) {
             lmraSection.style.display = 'flex';
-            console.log("truetrue");
         };
 
         checkWerkbonnenCompleteness(werkbonnenBenodigd, verstuurdeWerkbonnenArray);
@@ -99,15 +112,13 @@ window.addEventListener('load', function () {
     }
 
     // display jobinfo in header function
-    function placeTextInHeader(data) {
-        const soortKlusName = getDropdownOptionByValue('5e386287-7885-43f6-9dc5-ff494cec5be4', data).name;
-        const jobName = data.name;
+    function placeTextInHeader(jobObj) {
 
         const jobInfoHeader = document.getElementById("job-info-header");
         jobInfoHeader.innerHTML = ""; // Clear existing content
 
-        const jobnameNode = document.createTextNode(jobName);
-        const soortKlusNode = document.createTextNode(soortKlusName);
+        const jobnameNode = document.createTextNode(jobObj.jobName);
+        const soortKlusNode = document.createTextNode(jobObj.soortKlus);
 
         // Create div elements for styling
         const jobnameDiv = document.createElement("div");
@@ -124,11 +135,28 @@ window.addEventListener('load', function () {
         jobInfoHeader.appendChild(soortKlusDiv);
     }
 
+    // Add href to button elements
+    function addHrefToElement(id, jobObj) {
+        const currentElement = document.getElementById(`false${id}`);
+        const taskParams = {
+            taskid: jobObj.taskId,
+            formid: id,
+            opdref: jobObj.opdRef,
+            opdrachtgevername: jobObj.opdrachtgeverName,
+            opdrachtgeverid: jobObj.opdrachtgeverId,
+            naamklant: jobObj.naamKlant,
+            adres: jobObj.adres
+        };
+        const queryString = Object.keys(taskParams)
+            .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(taskParams[key])}`)
+            .join("&");
+        const urlToSet = `https://dash.chargecars.nl/formulier?${queryString}`;
+        currentElement.setAttribute("href", urlToSet);
+    }
+
     // Get filled workorders from clickup custom tag field
     function extractVerstuurdeWerkbonnenArray(data) {
-        const verstuurdeWerkbonnenField = data.custom_fields.find(
-            field => field.id === 'f3245e18-c65b-41c3-85e3-da7c58c16e2d'
-        );
+        const verstuurdeWerkbonnenField = getCustomFieldObject(data, 'f3245e18-c65b-41c3-85e3-da7c58c16e2d');
 
         if (!verstuurdeWerkbonnenField || !verstuurdeWerkbonnenField.value) {
             console.error('verstuurdeWerkbonnenArray data is missing or improperly formatted.');
@@ -139,7 +167,7 @@ window.addEventListener('load', function () {
     }
 
     function getWerkbonnenBenodigd(data) {
-        const soortKlusId = getDropdownOptionByValue('5e386287-7885-43f6-9dc5-ff494cec5be4', data).id;
+        const soortKlusId = getDropdownOptionByValue(data, '5e386287-7885-43f6-9dc5-ff494cec5be4').id;
 
         switch (soortKlusId) {
             case '5aba3565-a745-4ea3-88f4-b9d830217902'/*installatie*/:
@@ -181,9 +209,21 @@ window.addEventListener('load', function () {
         }
     }
 
-    function getDropdownOptionByValue(customFieldId, data) {
-        const field = data.custom_fields.find(field => field.id === customFieldId);
+    function getDropdownOptionByValue(data, fieldId) {
+        const field = getCustomFieldObject(data, fieldId);
+
+        if (!field || !field.type_config || !field.type_config.options || !Array.isArray(field.type_config.options)) {
+            console.error('Dropdown options are missing or improperly formatted.');
+            return null;
+        }
+
         const selectedOptionOrderIndex = field.value;
+
+        if (typeof selectedOptionOrderIndex !== 'number') {
+            console.error('Invalid field value format.');
+            return null;
+        }
+
         const selectedOption = field.type_config.options.find(option => option.orderindex === selectedOptionOrderIndex);
 
         if (selectedOption) {
@@ -191,5 +231,21 @@ window.addEventListener('load', function () {
         } else {
             throw new Error(`Object met orderindex ${selectedOptionOrderIndex} niet gevonden.`);
         }
+    }
+
+    // Get custom field object by id
+    function getCustomFieldObject(data, fieldId) {
+        if (!data.custom_fields || !Array.isArray(data.custom_fields)) {
+            console.error('Custom fields data is missing or improperly formatted.');
+            return null;
+        }
+
+        const customFields = data.custom_fields;
+        for (const currentField of customFields) {
+            if (currentField.id === fieldId) {
+                return currentField;
+            }
+        }
+        return null; /*Return null if fieldId is not found*/
     }
 });
