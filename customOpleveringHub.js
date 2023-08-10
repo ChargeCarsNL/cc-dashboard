@@ -142,7 +142,7 @@ window.addEventListener('load', function () {
             taskid: jobObj.taskId,
             formid: id,
             opdref: jobObj.opdRef,
-            opdrachtgevername: jobObj.opdrachtgeverName,
+            opdrachtgever: jobObj.opdrachtgeverName,
             opdrachtgeverid: jobObj.opdrachtgeverId,
             naamklant: jobObj.naamKlant,
             adres: jobObj.adres
