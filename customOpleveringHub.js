@@ -112,7 +112,7 @@ window.addEventListener('load', function () {
         );
 
         if (!verstuurdeWerkbonnenField || !verstuurdeWerkbonnenField.value) {
-            console.error('verstuurdeWerkbonnenArray data is missing or improperly formatted. Lul');
+            console.error('verstuurdeWerkbonnenArray data is missing or improperly formatted. Lullig');
             return [];
         }
 
