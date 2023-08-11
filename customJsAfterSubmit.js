@@ -7,6 +7,9 @@ $form.on('fluentform_submission_success', function () {
     // Get values from form
     const taskid = $form.find("[name='taskid']").val() || null;
     const formid = $form.find("[name='formid']").val() || null;
+    const opdref = $form.find("[name='opdref']").val() || null;
+    const opdrachtgever = $form.find("[name='opdrachtgever']").val() || null;
+    const naamklant = $form.find("[name='naamklant']").val() || null;
     const dlform = $form.find("[name='dlform']").val() || null;
     const dlsign = $form.find("[name='dlsign']").val() || null;
 
@@ -19,6 +22,9 @@ $form.on('fluentform_submission_success', function () {
             {
                 'taskid': taskid,
                 "formid": formid,
+                "opdref": opdref,
+                "opdrachtgever": opdrachtgever,
+                "naamklant": naamklant,
                 "dlform": dlform,
                 "dlsign": dlsign
             }
