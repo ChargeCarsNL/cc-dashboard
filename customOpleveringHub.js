@@ -64,7 +64,7 @@ window.addEventListener('load', function () {
         // display buttons based on requirements
         werkbonnenArray.forEach(id => {
             updateChildElements(id, verstuurdeWerkbonnenArray, werkbonnenBenodigd);
-            addHrefToElement(id, jobObj);
+            addHrefToElement(data, id, jobObj);
         });
 
         // hide lmra if not required
@@ -136,16 +136,18 @@ window.addEventListener('load', function () {
     }
 
     // Add href to button elements
-    function addHrefToElement(id, jobObj) {
+    function addHrefToElement(data, id, jobObj) {
         const currentElement = document.getElementById(`false${id}`);
         const taskParams = {
             taskid: jobObj.taskId,
             formid: id,
             opdref: jobObj.opdRef,
-            opdrachtgevername: jobObj.opdrachtgeverName,
+            opdrachtgever: jobObj.opdrachtgeverName,
             opdrachtgeverid: jobObj.opdrachtgeverId,
             naamklant: jobObj.naamKlant,
-            adres: jobObj.adres
+            adres: jobObj.adres,
+            soortklus: jobObj.soortKlus,
+            formname: getCurrentFormName(data, id)
         };
         const queryString = Object.keys(taskParams)
             .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(taskParams[key])}`)
@@ -191,6 +193,13 @@ window.addEventListener('load', function () {
             default:
                 return [];
         }
+    }
+
+    function getCurrentFormName(data, formId) {
+        const optionsArray = getCustomFieldObject(data, 'f3245e18-c65b-41c3-85e3-da7c58c16e2d').type_config.options;
+        const selectedOption = optionsArray.find(option => option.id === formId).label;
+
+        return selectedOption;
     }
 
     function updateChildElements(id, verstuurdeWerkbonnenArray, werkbonnenBenodigd) {
