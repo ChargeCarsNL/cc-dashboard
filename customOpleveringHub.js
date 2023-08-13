@@ -55,8 +55,6 @@ window.addEventListener('load', function () {
             "adres": getCustomFieldObject(data, 'd37d5497-3113-4851-9c4e-49c2c151ed3d').value.formatted_address
         };
 
-        console.log(getCustomFieldObject(data, '6a3fc1d2-565c-4c23-9b07-cd010c9f682a').value);
-
         placeTextInHeader(jobObj);
 
         const verstuurdeWerkbonnenArray = extractVerstuurdeWerkbonnenArray(data);
@@ -139,6 +137,15 @@ window.addEventListener('load', function () {
 
     // Add href to button elements
     function addHrefToElement(id, jobObj) {
+        // Declareer formNameMappings
+        const formNameMappings = {
+            "39ce6e14-6b51-42f9-80bd-10ff8b74bd1e": "LMRA Werkbon",
+            "8c0c0d66-cac9-4bbe-b460-ed12b8d8dda1": "Installatie Werkbon",
+            "35616272-f1f3-4a26-9eef-780b386f737e": "Groepenkast Werkbon",
+            "77254513-df56-493e-8e48-349c2fadd3c4": "Service Werkbon",
+            "92562e08-682c-41c8-b656-67e1b467ca1c": "Demontage Werkbon",
+            "3427c7d5-a12c-48ed-8114-55fe7af0ddfd": "Schouwing Werkbon"
+        };
         const currentFormName = formNameMappings[id];
         const currentElement = document.getElementById(`false${id}`);
         const taskParams = {
