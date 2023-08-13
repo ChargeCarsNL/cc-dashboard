@@ -49,11 +49,13 @@ window.addEventListener('load', function () {
             "jobName": data.name,
             "opdRef": getCustomFieldObject(data, '97d824e2-abdc-4adc-a5f3-4dd748fc6234').value,
             "opdrachtgeverId": data.list.id,
-            "opdrachtgeverName": data.list.name,
+            "opdrachtgever": data.list.name,
             "naamKlant": getCustomFieldObject(data, '6a3fc1d2-565c-4c23-9b07-cd010c9f682a').value + " " + getCustomFieldObject(data, '30db299f-c3e4-406a-ab46-7ea763648799').value,
             "soortKlus": getDropdownOptionByValue(data, '5e386287-7885-43f6-9dc5-ff494cec5be4').name,
             "adres": getCustomFieldObject(data, 'd37d5497-3113-4851-9c4e-49c2c151ed3d').value.formatted_address
         };
+
+        console.log(getCustomFieldObject(data, '6a3fc1d2-565c-4c23-9b07-cd010c9f682a').value);
 
         placeTextInHeader(jobObj);
 
@@ -64,7 +66,7 @@ window.addEventListener('load', function () {
         // display buttons based on requirements
         werkbonnenArray.forEach(id => {
             updateChildElements(id, verstuurdeWerkbonnenArray, werkbonnenBenodigd);
-            addHrefToElement(data, id, jobObj);
+            addHrefToElement(id, jobObj);
         });
 
         // hide lmra if not required
@@ -136,18 +138,27 @@ window.addEventListener('load', function () {
     }
 
     // Add href to button elements
-    function addHrefToElement(data, id, jobObj) {
+    function addHrefToElement(id, jobObj) {
+        const formNameMappings = {
+            "39ce6e14-6b51-42f9-80bd-10ff8b74bd1e": "LMRA Werkbon",
+            "8c0c0d66-cac9-4bbe-b460-ed12b8d8dda1": "Installatie Werkbon",
+            "35616272-f1f3-4a26-9eef-780b386f737e": "Groepenkast Werkbon",
+            "77254513-df56-493e-8e48-349c2fadd3c4": "Service Werkbon",
+            "92562e08-682c-41c8-b656-67e1b467ca1c": "Demontage Werkbon",
+            "3427c7d5-a12c-48ed-8114-55fe7af0ddfd": "Schouwing Werkbon"
+          };
+        const currentFormName = formNameMappings[id];
         const currentElement = document.getElementById(`false${id}`);
         const taskParams = {
             taskid: jobObj.taskId,
             formid: id,
             opdref: jobObj.opdRef,
-            opdrachtgever: jobObj.opdrachtgeverName,
+            opdrachtgever: jobObj.opdrachtgever,
             opdrachtgeverid: jobObj.opdrachtgeverId,
             naamklant: jobObj.naamKlant,
-            adres: jobObj.adres,
             soortklus: jobObj.soortKlus,
-            formname: getCurrentFormName(data, id)
+            formname: currentFormName,
+            adres: jobObj.adres
         };
         const queryString = Object.keys(taskParams)
             .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(taskParams[key])}`)
@@ -193,13 +204,6 @@ window.addEventListener('load', function () {
             default:
                 return [];
         }
-    }
-
-    function getCurrentFormName(data, formId) {
-        const optionsArray = getCustomFieldObject(data, 'f3245e18-c65b-41c3-85e3-da7c58c16e2d').type_config.options;
-        const selectedOption = optionsArray.find(option => option.id === formId).label;
-
-        return selectedOption;
     }
 
     function updateChildElements(id, verstuurdeWerkbonnenArray, werkbonnenBenodigd) {
@@ -258,3 +262,4 @@ window.addEventListener('load', function () {
         return null; /*Return null if fieldId is not found*/
     }
 });
+

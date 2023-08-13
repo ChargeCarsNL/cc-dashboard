@@ -5,7 +5,7 @@ window.addEventListener('load', function () {
 
     const taskId = urlParams.get('taskid');
     const opdRef = urlParams.get('opdref');
-    const opdrachtgeverName = urlParams.get('opdrachtgevername');
+    const opdrachtgever = urlParams.get('opdrachtgever');
     const naamKlant = urlParams.get('naamklant');
     const adres = urlParams.get('adres');
 
@@ -17,15 +17,19 @@ window.addEventListener('load', function () {
     opdRefElement.textContent = opdRef;
     opdRefElement.style.fontWeight = "bold";
 
-    const opdrachtgeverKlantText = `${opdrachtgeverName} - ${naamKlant}`;
+    const opdrachtgeverKlantText = `${opdrachtgever} - ${naamKlant}`;
     var opdrachtGeverKlantElement = document.createElement("p");
     opdrachtGeverKlantElement.textContent = opdrachtgeverKlantText;
 
     var adresElement = document.createElement("p");
     adresElement.textContent = adres;
 
+    console.log(opdrachtgever);
+    console.log(naamKlant);
+
     // Append the elements to the container
     jobInfoContainer.appendChild(opdRefElement);
     jobInfoContainer.appendChild(opdrachtGeverKlantElement);
     jobInfoContainer.appendChild(adresElement);
+    
 });
