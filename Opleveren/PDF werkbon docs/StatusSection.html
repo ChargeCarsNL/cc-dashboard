@@ -1,0 +1,27 @@
+[ff_if field="input_radio" is="equal" to="Ja"]
+
+    [ff_sub_if field="input_radio_1" is="equal" to="Ja"]
+
+        [ff_sub_sub_if field="input_radio_2" is="equal" to="Nee"]
+
+        <p style="background-color: #e6f6df; color: green; padding: 5px 10px; border-radius: 6px; font-size: 11px; width: 100px; text-align: center;">Geen risico's</p>
+
+        [/ff_sub_sub_if]
+
+    [/ff_sub_if]
+
+[/ff_if]
+
+[ff_if field="input_radio_3" is="equal" to="Ja"]
+
+<p style="background-color: #ffeacc; color: #db5800; padding: 5px 10px; border-radius: 6px; font-size: 11px; width: 100px; text-align: center;">Risico's opgenomen</p>
+
+[/ff_if]
+
+[ff_if field="input_radio_3" is="equal" to="Nee"]
+
+<p style="background-color: rgb(255, 199, 199); color: red; padding: 5px 10px; border-radius: 6px; font-size: 11px; width: 100px; text-align: center;">Geannuleerd</p>
+
+[/ff_if]
+
+<p>{all_data_without_hidden_fields}</p>
