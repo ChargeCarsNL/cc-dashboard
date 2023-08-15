@@ -5,7 +5,7 @@ window.addEventListener('load', function () {
     const url = window.location.href;
 
     // Array met vereiste parameters
-    const requiredParameters = ["taskid", "formid", "opdref", "opdrachtgever", "opdrachtgeverid", "naamklant", "adres", "soortklus", "formname", "dlform"];
+    const requiredParameters = ["taskid", "formid", "opdref", "opdrachtgever", "opdrachtgeverid", "naamklant", "adres", "soortklus", "formname", "status", "statusmessage", "dlform"];
 
     // Functie om te controleren of een parameter aanwezig is in de URL en een string is
     function controleerParameters() {
@@ -72,19 +72,12 @@ window.addEventListener('load', function () {
         const adres = extractUrlParameter("adres");
         const soortklus = extractUrlParameter("soortklus");
         const formname = extractUrlParameter("formname");
+        const status = extractUrlParameter("status");
+        const statusmessage = extractUrlParameter("statusmessage");
 
         // Split dlform en dlsign
         const dlformSplit = url.split("dlform=");
-        const naDlform = dlformSplit[dlformSplit.length - 1];
-        const dlArray = naDlform.split("&dlsign=");
-
-        const dlform = dlArray[0];
-        let dlsign = "";
-
-        // Als dlsign bestaat, stel dan de parameterwaarde in
-        if (dlArray.length > 1) {
-            dlsign = dlArray[1];
-        };
+        const dlform = dlformSplit[dlformSplit.length - 1];
 
         // Initialiseer de trigger-URL
         const flowTriggerUrl = "https://prod-159.westeurope.logic.azure.com:443/workflows/8b2be737ee804dbc902b49adde2b1a5e/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=IvKTz0kCTEdvFW9vExUQHKnWYWVl-Qe_eTTWV4C_L08";
@@ -100,8 +93,9 @@ window.addEventListener('load', function () {
             "adres": adres,
             "soortklus": soortklus,
             "formname": formname,
-            "dlform": dlform,
-            "dlsign": dlsign
+            "status": status,
+            "statusmessage": statusmessage,
+            "dlform": dlform
         }
 
         console.log(jsonBody);
