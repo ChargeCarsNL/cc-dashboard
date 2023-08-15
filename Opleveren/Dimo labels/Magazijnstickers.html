@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Label Template</title>
+  <style>
+    body {
+      width: 51mm;
+      height: 19mm;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .qr-code {
+      text-align: center;
+      margin-right: 5px;
+    }
+
+    .data {
+      font-size: 12px; /* Aangepaste lettergrootte */
+    }
+  </style>
+</head>
+<body>
+  <div class="qr-code">
+    <img src="https://chart.googleapis.com/chart?cht=qr&chs=100x100&chl=https://app.clickup.com/t/20122951/CC-17239" alt="QR Code">
+  </div>
+  <div class="data">
+    <p><span>12345</span></p>
+    <p><span>Bedrijf XYZ</span></p>
+    <p><span>John Doe</span></p>
+  </div>
+</body>
+</html>
