@@ -5,7 +5,7 @@ window.addEventListener('load', function () {
     const url = window.location.href;
 
     // Array met vereiste parameters
-    const requiredParameters = ["taskid", "formid", "opdref", "opdrachtgever", "opdrachtgeverid", "naamklant", "adres", "soortklus", "formname", "status", "statusmessage", "dlform"];
+    const requiredParameters = ["taskid", "formid", "opdref", "opdrachtgever", "opdrachtgeverid", "naamklant", "adres", "soortklus", "formname", "status", "dlform"];
 
     // Functie om te controleren of een parameter aanwezig is in de URL en een string is
     function controleerParameters() {
@@ -73,7 +73,6 @@ window.addEventListener('load', function () {
         const soortklus = extractUrlParameter("soortklus");
         const formname = extractUrlParameter("formname");
         const status = extractUrlParameter("status");
-        const statusmessage = extractUrlParameter("statusmessage");
 
         // Split dlform en dlsign
         const dlformSplit = url.split("dlform=");
@@ -94,7 +93,6 @@ window.addEventListener('load', function () {
             "soortklus": soortklus,
             "formname": formname,
             "status": status,
-            "statusmessage": statusmessage,
             "dlform": dlform
         }
 
