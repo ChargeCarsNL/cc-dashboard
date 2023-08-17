@@ -58,8 +58,10 @@ window.addEventListener('load', function () {
         placeTextInHeader(jobObj);
 
         const verstuurdeWerkbonnenArray = extractVerstuurdeWerkbonnenArray(data);
+        console.log(`Verzonden werkbonnen clickup: ${verstuurdeWerkbonnenArray}`)
 
         const werkbonnenBenodigd = getWerkbonnenBenodigd(data);
+        console.log(`Benodigde werkbonnen: ${werkbonnenBenodigd}`);
 
         // display buttons based on requirements
         werkbonnenArray.forEach(id => {
@@ -97,18 +99,16 @@ window.addEventListener('load', function () {
     }
 
     // Function that check if arrays are equal
-    function arraysAreEqual(array1, array2) {
-        if (array1.length !== array2.length) {
-            return false;
-        }
+    function arraysAreEqual(werkbonnenBenodigd, verstuurdeWerkbonnenArray) {
+        const werkbonnenCompleet = true;
 
-        for (let i = 0; i < array1.length; i++) {
-            if (!array2.includes(array1[i])) {
-                return false;
+        for (let i = 0; i < werkbonnenBenodigd.length; i++) {
+            if (!verstuurdeWerkbonnenArray.includes(werkbonnenBenodigd[i])) {
+                werkbonnenCompleet = false;
             }
-        }
+        };
 
-        return true;
+        return werkbonnenCompleet;
     }
 
     // display jobinfo in header function
@@ -169,6 +169,7 @@ window.addEventListener('load', function () {
     // Get filled workorders from clickup custom tag field
     function extractVerstuurdeWerkbonnenArray(data) {
         const verstuurdeWerkbonnenField = getCustomFieldObject(data, 'f3245e18-c65b-41c3-85e3-da7c58c16e2d');
+        console.log(verstuurdeWerkbonnenField);
 
         if (!verstuurdeWerkbonnenField || !verstuurdeWerkbonnenField.value) {
             console.error('verstuurdeWerkbonnenArray data is missing or improperly formatted.');
