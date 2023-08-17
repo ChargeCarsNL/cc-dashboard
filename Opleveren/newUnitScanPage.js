@@ -1,10 +1,18 @@
 // --------------------------on page load-------------------------------
+// Declare screens
 var knownUnitScreen = document.getElementById('known_unit_screen');
 var newUnitScreen = document.getElementById('new_unit_screen');
 knownUnitScreen.style.display = 'none';
 newUnitScreen.style.display = 'none';
 
+// Declare form fields
+var newUnitTextInput = document.getElementById('new_unit_text_input');
+var voorraadSelect = document.getElementById('voorraad_select'); 
+
+// Declare buttons
 var closeButton = document.getElementById('close_button'); 
+var unitToevoegenButton = document.getElementById('unit_toevoegen_button'); 
+var aanVoorraadToevoegenButton = document.getElementById('aan_voorraad_toevoegen_button'); 
 
 window.addEventListener('load', function () {
 
@@ -64,6 +72,15 @@ function runNewUnitScreen() {
     knownUnitScreen.style.display = 'none';
 }
 
+unitToevoegenButton.addEventListener("click", function() {
+    // add filled unit to clickup list
+    if ()
+});
+
+aanVoorraadToevoegenButton.addEventListener("click", function() {
+    // add new voorraad item connected to unit item
+});
+
 closeButton.addEventListener("click", function() {
     // Pas de stijl van het te verbergen element aan om het onzichtbaar te maken
     knownUnitScreen.style.display = "none";
@@ -108,3 +125,4 @@ function getCustomFieldValueById(customFieldArray, customFieldId) {
     }
     return null; /*Return null if fieldId is not found*/
 }
+
