@@ -5,6 +5,11 @@ var newUnitScreen = document.getElementById('new_unit_screen');
 knownUnitScreen.style.display = 'none';
 newUnitScreen.style.display = 'none';
 
+var errorMessageScreen = document.getElementById('error_message_screen');
+var errorMessageText = document.getElementById('error_message_text');
+var succesMessageScreen = document.getElementById('succes_message_screen');
+var succesMessageText = document.getElementById('succes_message_text');
+
 // Declare form fields
 var newUnitTextInput = document.getElementById('new_unit_text_input');
 var voorraadSelect = document.getElementById('voorraad_select');
@@ -53,29 +58,23 @@ window.addEventListener('load', function () {
 barcodeInputElement.addEventListener('input', async function () {
     const scannedCode = barcodeInputElement.value;
 
-    if (scannedCode.length > 0) {
-        currentUnitClassItem = await getUnitClass(scannedCode);
+    // Krijg de index van het het voorraad select input veld
+    const selectedIndex = voorraadSelect.selectedIndex;
 
-        if (currentUnitClassItem != null) {
-            const currentUnitName = currentUnitClassItem.name;
-            runKnownUnitScreen(currentUnitName);
-          } else {
-            runNewUnitScreen();
-          }
+    if (scannedCode.length > 0) {
+        if (selectedIndex > 0) {
+            currentUnitClassItem = await getUnitClass(scannedCode);
+
+            if (currentUnitClassItem != null) {
+                addUnitToSelectedVoorraad(scannedCode, currentUnitClassItem, selectedIndex);
+            } else {
+                runNewUnitScreen();
+            }
+        } else {
+            runErrorMessage('Geen voorraad geselecteerd');
+        }
     }
 });
-
-function runKnownUnitScreen(currentUnitName) {
-    knownUnitScreen.style.display = 'flex';
-    newUnitScreen.style.display = 'none';
-    const unitNameDisplayelement = document.getElementById('unit_name_display');
-    unitNameDisplayelement.textContent = currentUnitName;
-}
-
-function runNewUnitScreen() {
-    newUnitScreen.style.display = 'flex';
-    knownUnitScreen.style.display = 'none';
-}
 
 unitToevoegenButton.addEventListener("click", function () {
     // add filled unit to clickup list
@@ -95,14 +94,6 @@ aanVoorraadToevoegenButton.addEventListener("click", function () {
     // Krijg de index van het geselecteerde item
     const selectedIndex = voorraadSelect.selectedIndex;
 
-    if (selectedIndex != 0) {
-        const scannedCode = barcodeInputElement.value;
-        // Krijg het geselecteerde optie-element
-        const selectedOption = voorraadSelect.options[selectedIndex];
-        // Krijg de waarde van het geselecteerde item
-        const selectedVoorraad = selectedOption.value;
-        addUnitToSelectedVoorraad(scannedCode, selectedVoorraad);
-    }
 });
 
 closeButtonKnownUnitScreen.addEventListener("click", function () {
@@ -177,6 +168,67 @@ function addItemToUnitClassList(unitCode, unitName) {
         });
 }
 
-function addUnitToSelectedVoorraad(scannedCode, selectedVoorraad) {
+function addUnitToSelectedVoorraad(scannedCode, currentUnitClassItem, selectedIndex) {
+    // Krijg de key / value pair van geselecteerde optie
+    const selectedOption = voorraadSelect.options[selectedIndex];
+    // Krijg de waarde van het geselecteerde item
+    const selectedVoorraad = selectedOption.value;
+
+    const unitClassName = currentUnitClassItem.name;
+    const unitClassId = currentUnitClassItem.id;
     
+    // voeg item toe aan juiste clickup voorraad lijst
+    const url = 'https://prod-189.westeurope.logic.azure.com:443/workflows/db5e25179b4b4ac8bb43551fb17388ba/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=e68NLwrVMujBi3KiJ7SvEkGUMWDAL8Vukh8Qx88QD38';
+    console.log(`item: ${unitClassName} - ${scannedCode} wordt aan voorraad lijst toegevoegd`)
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'selectedvoorraad': selectedVoorraad,
+            'scannedcode': scannedCode,
+            'unitclassname': unitClassName,
+            'unitclassid': unitClassId
+        }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            console.log(`Unit met id:${data.created_item_id} toegevoegd aan lijst`);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+}
+
+function runKnownUnitScreen(currentUnitName) {
+    knownUnitScreen.style.display = 'flex';
+    newUnitScreen.style.display = 'none';
+    const unitNameDisplayelement = document.getElementById('unit_name_display');
+    unitNameDisplayelement.textContent = currentUnitName;
+}
+
+function runNewUnitScreen() {
+    newUnitScreen.style.display = 'flex';
+    knownUnitScreen.style.display = 'none';
+}
+
+function runErrorMessage(message) {
+    errorMessageText.textContent = message;
+    errorMessageScreen.style.display = 'flex'; // Display the element
+
+    // After the specified duration, hide the element
+    setTimeout(function () {
+        element.style.display = 'none'; // Hide the element
+    }, 3000);
+}
+
+function runSuccesMessage(message) {
+    errorMessageText.textContent = message;
+    errorMessageScreen.style.display = 'flex'; // Display the element
+
+    // After the specified duration, hide the element
+    setTimeout(function () {
+        element.style.display = 'none'; // Hide the element
+    }, 3000);
 }
