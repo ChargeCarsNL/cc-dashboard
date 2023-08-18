@@ -24,9 +24,6 @@ window.addEventListener('load', function () {
     var adresElement = document.createElement("p");
     adresElement.textContent = adres;
 
-    console.log(opdrachtgever);
-    console.log(naamKlant);
-
     // Append the elements to the container
     jobInfoContainer.appendChild(opdRefElement);
     jobInfoContainer.appendChild(opdrachtGeverKlantElement);
