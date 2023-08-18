@@ -1,8 +1,6 @@
 // --------------------------on page load-------------------------------
 // Declare screens
-var knownUnitScreen = document.getElementById('known_unit_screen');
 var newUnitScreen = document.getElementById('new_unit_screen');
-knownUnitScreen.style.display = 'none';
 newUnitScreen.style.display = 'none';
 
 var errorMessageScreen = document.getElementById('error_message_screen');
@@ -18,7 +16,6 @@ var voorraadSelect = document.getElementById('voorraad_select');
 var barcodeInputElement = document.getElementById('barcode_scanner_input');
 
 // Declare buttons
-var closeButtonKnownUnitScreen = document.getElementById('close_button_known_unit_screen');
 var closeButtonNewUnitScreen = document.getElementById('close_button_new_unit_screen');
 var unitToevoegenButton = document.getElementById('unit_toevoegen_button');
 var aanVoorraadToevoegenButton = document.getElementById('aan_voorraad_toevoegen_button');
@@ -96,14 +93,7 @@ aanVoorraadToevoegenButton.addEventListener("click", function () {
 
 });
 
-closeButtonKnownUnitScreen.addEventListener("click", function () {
-    knownUnitScreen.style.display = "none";
-    newUnitScreen.style.display = "none";
-    console.log('closed');
-});
-
 closeButtonNewUnitScreen.addEventListener("click", function () {
-    knownUnitScreen.style.display = "none";
     newUnitScreen.style.display = "none";
     console.log('closed');
 });
@@ -172,7 +162,10 @@ function addUnitToSelectedVoorraad(scannedCode, currentUnitClassItem, selectedIn
     // Krijg de key / value pair van geselecteerde optie
     const selectedOption = voorraadSelect.options[selectedIndex];
     // Krijg de waarde van het geselecteerde item
-    const selectedVoorraad = selectedOption.value;
+    const selectedVoorraad = {
+        "name": selectedOption.text,
+        "value": selectedOption.value
+    }
 
     const unitClassName = currentUnitClassItem.name;
     const unitClassId = currentUnitClassItem.id;
@@ -186,7 +179,7 @@ function addUnitToSelectedVoorraad(scannedCode, currentUnitClassItem, selectedIn
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            'selectedvoorraad': selectedVoorraad,
+            'selectedvoorraad': selectedVoorraad.value,
             'scannedcode': scannedCode,
             'unitclassname': unitClassName,
             'unitclassid': unitClassId
@@ -194,23 +187,17 @@ function addUnitToSelectedVoorraad(scannedCode, currentUnitClassItem, selectedIn
     })
         .then(response => response.json())
         .then(data => {
-            console.log(`Unit met id:${data.created_item_id} toegevoegd aan lijst`);
+            console.log(`Unit met id:${data.created_item_id} toegevoegd aan voorraad`);
+            runSuccesMessage(`${unitClassName} succesvol toegevoegd aan ${selectedVoorraad.name}`);
         })
         .catch(error => {
             console.error('Error:', error);
+            runErrorMessage(`${unitClassName} kon niet worden toegevoegd aan ${selectedVoorraad.name}`);
         });
-}
-
-function runKnownUnitScreen(currentUnitName) {
-    knownUnitScreen.style.display = 'flex';
-    newUnitScreen.style.display = 'none';
-    const unitNameDisplayelement = document.getElementById('unit_name_display');
-    unitNameDisplayelement.textContent = currentUnitName;
 }
 
 function runNewUnitScreen() {
     newUnitScreen.style.display = 'flex';
-    knownUnitScreen.style.display = 'none';
 }
 
 function runErrorMessage(message) {
