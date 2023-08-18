@@ -35,7 +35,7 @@ window.addEventListener('load', function () {
         // Define voorraad select input
         const voorraadSelect = document.getElementById('voorraad_select');
         const voorraadLijstArray = data.lists;
-        console.log(voorraadLijstArray);
+        console.log(`Voorraadlijst array: ${voorraadLijstArray}`);
 
         for (let i = 0; i < voorraadLijstArray.length; i++) {
             // Maak een nieuwe optie aan
@@ -54,9 +54,11 @@ window.addEventListener('load', function () {
 // Voeg een event listener toe voor het 'input' event
 barcodeInputElement.addEventListener('input', async function () {
     const scannedCode = barcodeInputElement.value;
+    barcodeInputElement.value = null;
 
     // Krijg de index van het het voorraad select input veld
     const selectedIndex = voorraadSelect.selectedIndex;
+    console.log(`Selected index: ${selectedIndex}`);
 
     if (scannedCode.length > 0) {
         if (selectedIndex > 0) {
@@ -68,6 +70,7 @@ barcodeInputElement.addEventListener('input', async function () {
                 runNewUnitScreen();
             }
         } else {
+            console.log("ran error screen");
             runErrorMessage('Geen voorraad geselecteerd');
         }
     }
@@ -83,14 +86,6 @@ unitToevoegenButton.addEventListener("click", function () {
     } else {
         console.error('Error:', 'Geen waarde opgegeven');
     }
-});
-
-aanVoorraadToevoegenButton.addEventListener("click", function () {
-    // add new voorraad item connected to unit item
-
-    // Krijg de index van het geselecteerde item
-    const selectedIndex = voorraadSelect.selectedIndex;
-
 });
 
 closeButtonNewUnitScreen.addEventListener("click", function () {
@@ -206,16 +201,16 @@ function runErrorMessage(message) {
 
     // After the specified duration, hide the element
     setTimeout(function () {
-        element.style.display = 'none'; // Hide the element
+        errorMessageScreen.style.display = 'none'; // Hide the element
     }, 3000);
 }
 
 function runSuccesMessage(message) {
-    errorMessageText.textContent = message;
-    errorMessageScreen.style.display = 'flex'; // Display the element
+    succesMessageText.textContent = message;
+    succesMessageScreen.style.display = 'flex'; // Display the element
 
     // After the specified duration, hide the element
     setTimeout(function () {
-        element.style.display = 'none'; // Hide the element
+        succesMessageScreen.style.display = 'none'; // Hide the element
     }, 3000);
 }
