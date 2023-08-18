@@ -1,24 +1,24 @@
 // --------------------------on page load-------------------------------
 // Declare screens
-var newUnitScreen = document.getElementById('new_unit_screen');
+let newUnitScreen = document.getElementById('new_unit_screen');
 newUnitScreen.style.display = 'none';
 
-var errorMessageScreen = document.getElementById('error_message_screen');
-var errorMessageText = document.getElementById('error_message_text');
-var succesMessageScreen = document.getElementById('succes_message_screen');
-var succesMessageText = document.getElementById('succes_message_text');
+let errorMessageScreen = document.getElementById('error_message_screen');
+let errorMessageText = document.getElementById('error_message_text');
+let succesMessageScreen = document.getElementById('succes_message_screen');
+let succesMessageText = document.getElementById('succes_message_text');
 
 // Declare form fields
-var newUnitTextInput = document.getElementById('new_unit_text_input');
-var voorraadSelect = document.getElementById('voorraad_select');
+let newUnitTextInput = document.getElementById('new_unit_text_input');
+let voorraadSelect = document.getElementById('voorraad_select');
 
 // Haal het barcode input element op
-var barcodeInputElement = document.getElementById('barcode_scanner_input');
+let barcodeInputElement = document.getElementById('barcode_scanner_input');
 
 // Declare buttons
-var closeButtonNewUnitScreen = document.getElementById('close_button_new_unit_screen');
-var unitToevoegenButton = document.getElementById('unit_toevoegen_button');
-var aanVoorraadToevoegenButton = document.getElementById('aan_voorraad_toevoegen_button');
+let closeButtonNewUnitScreen = document.getElementById('close_button_new_unit_screen');
+let unitToevoegenButton = document.getElementById('unit_toevoegen_button');
+let aanVoorraadToevoegenButton = document.getElementById('aan_voorraad_toevoegen_button');
 
 window.addEventListener('load', function () {
 
