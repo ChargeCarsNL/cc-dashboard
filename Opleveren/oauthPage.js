@@ -20,11 +20,7 @@ function tokenHandling() {
             const timeTillExpire = 14;
 
             // Set cookies for the data
-            setCookie('token', token, timeTillExpire);
-            setCookie('user_name', userName, timeTillExpire);
-            setCookie('user_image_url', userImageUrl, timeTillExpire);
-            setCookie('user_id', userId, timeTillExpire);
-            setCookie('user_email', userEmail, timeTillExpire);
+            setCookie('cu_user_token', token, timeTillExpire);
         }
 
     }
@@ -32,12 +28,17 @@ function tokenHandling() {
 }
 
 function getAccessToken(code) {
-    const clientId = '';
-    const clientSecret = '';
-    const url = `https://api.clickup.com/api/v2/oauth/token?client_id=${clientId}&client_secret=${clientSecret}&code=${code}`;
+    const clientId = 'IPQVKKJYVDD3YTE3X1P1A1D0U0LKBT06';
+    const clientSecret = '6N7K27ELRG2U3NY2VD8UN8FJ8HJFDCS2Z0610056XKP2YB0K0RJ7FUSRP9BA8PLW';
+    const url = 'https://prod-111.westeurope.logic.azure.com:443/workflows/c1a7a2f208da4ca89aaca0346bdc3e98/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=8w8AVtZo0uZQrpfVGOvYgcF6_UFDnbUSrns_ywHowos';
 
     fetch(url, {
-        method: 'POST'
+        method: 'POST',
+        headers: {
+            'client_id': clientId,
+            'client_secret': clientSecret,
+            'code': code
+        }
     })
         .then(response => {
             return response.json();
@@ -64,7 +65,7 @@ function setCookie(name, value, days) {
 
 function getAuthorizedUser(accessToken) {
 
-    const url = 'https://api.clickup.com/api/v2/user';
+    const url = 'https://prod-178.westeurope.logic.azure.com:443/workflows/cccd6a9d2bc247e5a813834f87228b15/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0HRqHNN8VdMtpQ2tkcmv__5je-xZAmi7hr1zrTI1Rs0';
 
     fetch(url, {
         method: 'GET',

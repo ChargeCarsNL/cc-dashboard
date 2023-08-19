@@ -1,9 +1,5 @@
 // Function to check if the token is valid
 function getUserCredentials(token) {
-    // You should implement your own logic here to validate the token
-    // This might involve sending a request to your backend server for validation
-    // Return true if the token is valid, otherwise return false
-    // For the sake of this example, let's assume the token is valid if it's not empty
 
     const url = 'https://prod-178.westeurope.logic.azure.com:443/workflows/cccd6a9d2bc247e5a813834f87228b15/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0HRqHNN8VdMtpQ2tkcmv__5je-xZAmi7hr1zrTI1Rs0';
 
@@ -41,7 +37,7 @@ function getCookie(name) {
 // Main function to check token validity and redirect if needed
 function tokenValidation() {
     if (!isRedirectOrLoginUrl()) {
-        const token = getCookie('your_token_cookie_name'); // Change 'your_token_cookie_name' to the actual cookie name
+        const token = getCookie('cu_user_token'); // Change 'your_token_cookie_name' to the actual cookie name
         if (token) {
             // Token exists. Start validation and getting user info
             userCredentials = getUserCredentials(token);
