@@ -30,7 +30,7 @@ function tokenHandling() {
 function getAccessToken(code) {
     const clientId = 'IPQVKKJYVDD3YTE3X1P1A1D0U0LKBT06';
     const clientSecret = '6N7K27ELRG2U3NY2VD8UN8FJ8HJFDCS2Z0610056XKP2YB0K0RJ7FUSRP9BA8PLW';
-    const url = `https://api.clickup.com/api/v2/oauth/token?&client_secret=${clientSecret}&code=${code}`;
+    const url = `https://api.clickup.com/api/v2/oauth/token?client_id=${clientId}&client_secret=${clientSecret}&code=${code}`;
 
     proxyFetch(url, {
         method: 'POST',
