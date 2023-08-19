@@ -30,9 +30,9 @@ function tokenHandling() {
 function getAccessToken(code) {
     const clientId = 'IPQVKKJYVDD3YTE3X1P1A1D0U0LKBT06';
     const clientSecret = '6N7K27ELRG2U3NY2VD8UN8FJ8HJFDCS2Z0610056XKP2YB0K0RJ7FUSRP9BA8PLW';
-    const url = 'https://prod-111.westeurope.logic.azure.com:443/workflows/c1a7a2f208da4ca89aaca0346bdc3e98/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=8w8AVtZo0uZQrpfVGOvYgcF6_UFDnbUSrns_ywHowos';
+    const url = `https://api.clickup.com/api/v2/oauth/token?&client_secret=${clientSecret}&code=${code}`;
 
-    fetch(url, {
+    proxyFetch(url, {
         method: 'POST',
         headers: {
             'client_id': clientId,
