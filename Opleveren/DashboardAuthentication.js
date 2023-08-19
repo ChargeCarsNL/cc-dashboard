@@ -40,26 +40,46 @@ function getCookie(name) {
 
 // Main function to check token validity and redirect if needed
 function tokenValidation() {
-    const token = getCookie('your_token_cookie_name'); // Change 'your_token_cookie_name' to the actual cookie name
-    if (token) {
-        // Token exists. Start validation and getting user info
-        userCredentials = getUserCredentials(token);
-        if (userCredentials != null) {
-            // Unable to get user credentials. Re-authenticate at url
+    if (!isRedirectOrLoginUrl()) {
+        const token = getCookie('your_token_cookie_name'); // Change 'your_token_cookie_name' to the actual cookie name
+        if (token) {
+            // Token exists. Start validation and getting user info
+            userCredentials = getUserCredentials(token);
+            if (userCredentials != null) {
+                // Unable to get user credentials. Re-authenticate at url
+                reAuthenticate();
+            }
+        } else {
+            // Redirect the user to the authentication page
             reAuthenticate();
         }
-    } else {
-        // Redirect the user to the authentication page
-        reAuthenticate();
     }
 }
 
 function reAuthenticate() {
-    const clientId = 'BZDURFU0XGCONAQRFRSOH5XOENTIHDK5';
+    /*const clientId = 'BZDURFU0XGCONAQRFRSOH5XOENTIHDK5';
     const redirectUri = 'https://dash.chargecars.nl/oauth';
     authUrl = `https://app.clickup.com/api?client_id=${clientId}&redirect_uri=${redirectUri}`;
     // brings user to authentication page
-    window.location.href = authUrl;
+    window.location.href = authUrl;*/
+
+    const loginUrl = 'https://dash.chargecars.nl/user-login';
+    // bring user to login page
+    window.location.href = loginUrl;
+
+}
+
+// Function to check if the current URL matches the redirect URL
+function isRedirectOrLoginUrl() {
+    const currentUrl = window.location.href;
+    const redirectUrlPath = '/oauth';
+    const loginUrlPath = '/user-login'; 
+    if (currentUrl.includes(redirectUrlPath)) {
+        return true;
+    } else if (currentUrl.includes(loginUrlPath)) {
+        return true;
+    }
+    return false;
 }
 
 // Call the function when the page loads
