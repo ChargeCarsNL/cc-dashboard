@@ -12,7 +12,7 @@ function proxyFetch(url, requestObj) {
     console.log(`Running request with method: ${method}, Headers: ${headers}, Body: ${body}`);
     console.log(headers);
 
-    fetch(proxyUrl, {
+    await fetch(proxyUrl, {
         method: 'POST',
         headers: headers,
         body: body

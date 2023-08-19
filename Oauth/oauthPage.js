@@ -32,7 +32,7 @@ function getAccessToken(code) {
     const clientSecret = '6N7K27ELRG2U3NY2VD8UN8FJ8HJFDCS2Z0610056XKP2YB0K0RJ7FUSRP9BA8PLW';
     const url = `https://api.clickup.com/api/v2/oauth/token?client_id=${clientId}&client_secret=${clientSecret}&code=${code}`;
 
-    proxyFetch(url, {
+    const accessCode = proxyFetch(url, {
         method: 'POST',
         headers: {
             'client_id': clientId,
@@ -40,20 +40,15 @@ function getAccessToken(code) {
             'code': code
         }
     })
-        .then(response => {
-            return response.json();
-        })
-        .then(data => {
-            console.log('Flow trigger respons:', data);
-            const accessToken = data.access_token;
-            return accessToken;
-        })
-        .catch(error => {
-            console.error('Flow trigger fout:', error);
-            // Log de volledige foutrespons
-            console.log('Volledige foutrespons:', error.response);
-            return null;
-        });
+
+    if (accessCode != null) {
+        console.log(`AccesCode: ${accessCode} verkregen`);
+        return accessCode
+    }
+
+    console.log('Geen accescode verkregen');
+
+    return null;
 }
 
 // Function to set a cookie
@@ -94,4 +89,3 @@ function getUrlParameter(name) {
     const urlParams = new URLSearchParams(window.location.search);
     return urlParams.get(name);
 }
-
