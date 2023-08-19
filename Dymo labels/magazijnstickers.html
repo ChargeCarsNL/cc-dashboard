@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Label Template</title>
+  <style>
+    body {
+      width: 150mm;
+      height: 100mm;
+      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .paper-body {}
+
+    .qr-code {
+      text-align: center;
+    }
+
+    .main-container {
+      width: auto;
+      display: block;
+    }
+
+    .upper-container {
+      width: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lower-container {
+    }
+
+    p {
+      font-size: 6mm;
+      padding: 3mm;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="main-container">
+    <div class="upper-container">
+      <div class="qr-code">
+        <img style="width: 65mm; height: 65mm"
+          src="https://chart.googleapis.com/chart?cht=qr&chs=100x100&chl=@{triggerBody()?['payload']?['url']}"
+          alt="QR Code">
+      </div>
+      <div class="data">
+        <p>@{outputs('opf_ref')}</p>
+        <p>@{outputs('opdrachtgever')}</p>
+        <p>@{outputs('product')}</p>
+      </div>
+    </div>
+    <div class="lower-container">
+      <p>@{outputs('address')}</p>
+    </div>
+  </div>
+</body>
+
+</html>
