@@ -82,7 +82,7 @@ barcodeInputElement.addEventListener('input', async function () {
             }
         }
     } else {
-        runErrorMessage(`EAN code: ${scannedCode} is ongeldig`);
+        runErrorMessage(`EAN code: <strong>${scannedCode}</strong> is ongeldig`);
     }
 });
 
@@ -162,13 +162,13 @@ function addItemToUnitClassList(unitCode, unitName) {
         .then(data => {
             barcodeInputElement.value = '';
             stopLoadingScreen();
-            runSuccesMessage(`${unitName} toegevoegd aan bekende units`);
+            runSuccesMessage(`<strong>${unitName}</strong> toegevoegd aan bekende units`);
             console.log(`Unit met id:${data.created_item_id} toegevoegd aan lijst`);
         })
         .catch(error => {
             barcodeInputElement.value = '';
             stopLoadingScreen();
-            runErrorMessage(`Kon ${unitName} niet toevoegen aan bekende units`);
+            runErrorMessage(`Kon <strong>${unitName}</strong> niet toevoegen aan bekende units`);
             console.error('Error:', error);
         });
 }
@@ -207,13 +207,13 @@ function addUnitToSelectedVoorraad(scannedCode, currentUnitClassItem, selectedIn
             console.log(`Unit met id:${data.created_item_id} succesvol toegevoegd aan voorraad`);
             barcodeInputElement.value = '';
             stopLoadingScreen();
-            runSuccesMessage(`${unitClassName} succesvol toegevoegd aan ${selectedVoorraad.name}`);
+            runSuccesMessage(`<strong>${unitClassName}</strong> succesvol toegevoegd aan ${selectedVoorraad.name}`);
         })
         .catch(error => {
             console.error('Error:', error);
             barcodeInputElement.value = '';
             stopLoadingScreen();
-            runErrorMessage(`${unitClassName} kon niet worden toegevoegd aan ${selectedVoorraad.name}`);
+            runErrorMessage(`<strong>${unitClassName}</strong> kon niet worden toegevoegd aan ${selectedVoorraad.name}`);
         });
 }
 
@@ -262,29 +262,43 @@ function checkEANValidity(code) {
     return true;
 }
 
+let timeoutId; // Variabele om het timeout ID bij te houden
+
 function runErrorMessage(message) {
+    // Annuleer het vorige timeout als het bestaat
+    if (timeoutId) {
+        clearTimeout(timeoutId);
+    }
     stopLoadingScreen();
     console.error(`Fout. ${message}`);
-    errorMessageText.textContent = message;
-    errorMessageScreen.style.display = 'flex'; // Display the element
+    errorMessageText.innerHTML = message;
+    errorMessageScreen.style.top = '80px'; // get element in view
+    errorMessageScreen.style.opacity = '1'; // fade in
     barcodeInputElement.value = '';
 
-    // After the specified duration, hide the element
-    setTimeout(function () {
-        errorMessageScreen.style.display = 'none'; // Hide the element
+    // After the specified duration, hide the element and set timeoutId
+    timeoutId = setTimeout(function () {
+        errorMessageScreen.style.top = '-100px'; // Hide the element
+        errorMessageScreen.style.opacity = '0'; // fade out
     }, 3000);
 }
 
 function runSuccesMessage(message) {
+    // Annuleer het vorige timeout als het bestaat
+    if (timeoutId) {
+        clearTimeout(timeoutId);
+    }
     stopLoadingScreen();
     console.log(`Succes. ${message}`);
-    succesMessageText.textContent = message;
-    succesMessageScreen.style.display = 'flex'; // Display the element
+    succesMessageText.innerHTML = message;
+    succesMessageScreen.style.top = '80px'; // get element in view
+    succesMessageScreen.style.opacity = '1'; // fade in
     barcodeInputElement.value = '';
 
-    // After the specified duration, hide the element
-    setTimeout(function () {
-        succesMessageScreen.style.display = 'none'; // Hide the element
+    // After the specified duration, hide the element and set timeoutId
+    timeoutId = setTimeout(function () {
+        succesMessageScreen.style.top = '-100px'; // Hide the element
+        succesMessageScreen.style.opacity = '0'; // fade out
     }, 3000);
 }
 
