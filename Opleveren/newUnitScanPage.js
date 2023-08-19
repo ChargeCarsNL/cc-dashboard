@@ -58,7 +58,7 @@ barcodeInputElement.addEventListener('input', async function () {
     const scannedCode = barcodeInputElement.value;
     console.log(`Barcode scanned: ${scannedCode}`);
 
-    runLoadingScreen();
+    runLoadingScreen('Controleren of unit bekend is...');
 
     if (checkEANValidity(scannedCode)) {
         // Krijg de index van het het voorraad select input veld
@@ -70,6 +70,7 @@ barcodeInputElement.addEventListener('input', async function () {
                 currentUnitClassItem = await getUnitClass(scannedCode);
 
                 if (currentUnitClassItem != null) {
+                    runLoadingScreen('Item wordt aan voorraad toegevoegd');
                     addUnitToSelectedVoorraad(scannedCode, currentUnitClassItem, selectedIndex);
                 } else {
                     stopLoadingScreen();
@@ -87,7 +88,7 @@ barcodeInputElement.addEventListener('input', async function () {
 });
 
 unitToevoegenButton.addEventListener("click", function () {
-    runLoadingScreen();
+    runLoadingScreen('Unit toevoegen aan database');
     // add filled unit to clickup list
 
     const scannedCode = barcodeInputElement.value;
@@ -313,13 +314,30 @@ function stopNewUnitScreen() {
     barcodeInputElement.value = '';
 }
 
-function runLoadingScreen() {
+function runLoadingScreen(message) {
     console.log(`Aan het laden...`);
     const loadingScreen = document.getElementById('loading_screen');
     loadingScreen.style.display = 'flex';
+    document.getElementById('loading_text').innerHTML = message;
 }
 
 function stopLoadingScreen() {
     const loadingScreen = document.getElementById('loading_screen');
     loadingScreen.style.display = 'none';
+    document.getElementById('loading_text').innerHTML = 'Aan het laden...';
 }
+
+
+
+function toggleContent() {
+    const toggleSwitch = document.getElementById('toggleSwitch');
+    const content = document.getElementById('toggle_text');
+    
+    if (toggleSwitch.checked) {
+      content.innerHTML = 'Voorraad uitboeken';
+      content.style.color = 'var(--bricks-color-fgyvlm)';
+    } else {
+      content.innerHTML = 'Voorraad inboeken';
+      content.style.color = 'var(--bricks-color-coeckr)';
+    }
+  }
