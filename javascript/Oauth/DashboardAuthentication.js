@@ -6,7 +6,7 @@ async function getUserCredentials(token) {
         const response = await fetch(url, {
             method: 'GET',
             headers: {
-                'cu_token': token
+                'access_token': token
             }
         });
 

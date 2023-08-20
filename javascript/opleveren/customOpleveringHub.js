@@ -2,6 +2,12 @@ window.addEventListener('load', function () {
     const apiKey = '15c34515-3bfb-47fb-9a4c-b39de6822ca5';
     const taskId = new URLSearchParams(window.location.search).get('taskid');
 
+    console.log(taskId);
+    if (!taskId) {
+        showSearchJobScreen();
+        return;
+    }
+
     const url =
         'https://prod-86.westeurope.logic.azure.com:443/workflows/597c6ec246244650b9b4aab8bd45e87a/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=FJHndl9oqnpIvHeUDQ615IK26SKzEePM8-b7hXrFrh8';
 
@@ -259,3 +265,8 @@ window.addEventListener('load', function () {
         return null; /*Return null if fieldId is not found*/
     }
 });
+
+function showSearchJobScreen() {
+    showSearchJobScreen = document.getElementById('search_job_screen');
+    showSearchJobScreen.style.display = 'flex';
+}
