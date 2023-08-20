@@ -65,32 +65,6 @@ function getUrlParameter(name) {
     return urlParams.get(name);
 }
 
-async function proxyFetch(url, requestObj) {
-
-    const method = requestObj.method;
-
-    proxyUrl = 'https://prod-111.westeurope.logic.azure.com:443/workflows/c1a7a2f208da4ca89aaca0346bdc3e98/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=8w8AVtZo0uZQrpfVGOvYgcF6_UFDnbUSrns_ywHowos';
-    requestObj.headers.method = method
-    requestObj.headers.url = url;
-
-    const headers = requestObj.headers;
-    const body = requestObj.body;
-
-    console.log(`Running request with method: ${method}, Headers: ${headers}, Body: ${body}`);
-    console.log(headers);
-
-    try {
-        const response = await fetch(proxyUrl, requestObj);
-        if (!response.ok) {
-            throw new Error(`Fetch failed with status ${response.status}`);
-        }
-        return response.json();
-    } catch (error) {
-        console.error('Proxy fetch error:', error);
-        throw error;
-    }
-}
-
 async function getAuthorizedUser(accessToken) {
     const url = 'https://prod-178.westeurope.logic.azure.com:443/workflows/cccd6a9d2bc247e5a813834f87228b15/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=0HRqHNN8VdMtpQ2tkcmv__5je-xZAmi7hr1zrTI1Rs0';
 

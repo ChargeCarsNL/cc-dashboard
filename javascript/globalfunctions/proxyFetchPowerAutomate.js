@@ -1,4 +1,4 @@
-function proxyFetch(url, requestObj) {
+async function proxyFetch(url, requestObj) {
 
     const method = requestObj.method;
 
@@ -10,21 +10,15 @@ function proxyFetch(url, requestObj) {
     const body = requestObj.body;
 
     console.log(`Running request with method: ${method}, Headers: ${headers}, Body: ${body}`);
-    console.log(headers);
 
-    await fetch(proxyUrl, {
-        method: 'POST',
-        headers: headers,
-        body: body
-    })
-        .then(response => {
-            return response.json();
-        })
-        .then(data => {
-            return data;
-        })
-        .catch(error => {
-            console.error(error);
-            return error;
-        });
+    try {
+        const response = await fetch(proxyUrl, requestObj);
+        if (!response.ok) {
+            throw new Error(`Fetch failed with status ${response.status}`);
+        }
+        return response.json();
+    } catch (error) {
+        console.error('Proxy fetch error:', error);
+        throw error;
+    }
 }
