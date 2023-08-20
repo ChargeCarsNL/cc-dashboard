@@ -97,3 +97,5 @@ function setUsernameAndImage(username, profilePictureURL) {
 
 // Call the function when the page loads
 window.onload = tokenValidation();
+
+console.log('test12');
