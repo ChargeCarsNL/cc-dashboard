@@ -15,6 +15,8 @@ async function proxyFetch(url, requestObj) {
     const headers = requestObj.headers;
     const body = requestObj.body;
 
+    requestObj.method = 'POST';
+
     console.log(`Running request with method: ${method}, Headers: ${JSON.stringify(headers)}, Body: ${body}`);
 
     try {
