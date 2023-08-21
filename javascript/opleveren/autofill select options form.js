@@ -24,7 +24,7 @@ async function autoFillLaadpalen() {
         const options = laadpaalSoortenObj.tasks.map(soort => {
             return {
                 'name': soort.name,
-                'value': soort.id
+                'value': soort.name
             };
         });
 
@@ -122,6 +122,7 @@ window.addEventListener('load', async function () {
 });
 
 function removeAllOptions() {
+    const keyword = 'repeater_field_3_0';
     const allSelectElements = document.querySelectorAll(`[data-name*="${keyword}"]`);
     allSelectElements.forEach(selectElement => {
         while (selectElement.options.length > 0) {
