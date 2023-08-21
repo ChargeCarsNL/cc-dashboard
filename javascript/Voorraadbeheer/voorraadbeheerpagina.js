@@ -79,10 +79,12 @@ barcodeInputElement.addEventListener('input', async function () {
             } else {
                 stopLoadingScreen();
                 console.log("Geannulleerd. Geen voorraad geselecteerd");
+                barcodeInputElement.value = '';
                 runErrorMessage('Geen voorraad geselecteerd');
             }
         }
     } else {
+        barcodeInputElement.value = '';
         runErrorMessage(`EAN code: <strong>${scannedCode}</strong> is ongeldig`);
     }
 });
@@ -97,7 +99,9 @@ unitToevoegenButton.addEventListener("click", function () {
         stopNewUnitScreen();
         addItemToUnitClassList(scannedCode, filledValue)
     } else {
+        barcodeInputElement.value = '';
         stopLoadingScreen();
+        runErrorMessage(`Geen waarde opgegeven`);
         console.error('Error:', 'Geen waarde opgegeven');
     }
 });
@@ -208,12 +212,16 @@ function addUnitToSelectedVoorraad(scannedCode, currentUnitClassItem, selectedIn
             console.log(`Unit met id:${data.created_item_id} succesvol toegevoegd aan voorraad`);
             barcodeInputElement.value = '';
             stopLoadingScreen();
+            // Clear barcode input field for new input
+            barcodeInputElement.value = '';
             runSuccesMessage(`<strong>${unitClassName}</strong> succesvol toegevoegd aan ${selectedVoorraad.name}`);
         })
         .catch(error => {
             console.error('Error:', error);
             barcodeInputElement.value = '';
             stopLoadingScreen();
+            // Clear barcode input field for new input
+            barcodeInputElement.value = '';
             runErrorMessage(`<strong>${unitClassName}</strong> kon niet worden toegevoegd aan ${selectedVoorraad.name}`);
         });
 }
@@ -275,21 +283,6 @@ function stopNewUnitScreen() {
     newUnitTextInput.value = '';
     barcodeInputElement.value = '';
 }
-
-function runLoadingScreen(message) {
-    console.log(`Aan het laden...`);
-    const loadingScreen = document.getElementById('loading_screen');
-    loadingScreen.style.display = 'flex';
-    document.getElementById('loading_text').innerHTML = message;
-}
-
-function stopLoadingScreen() {
-    const loadingScreen = document.getElementById('loading_screen');
-    loadingScreen.style.display = 'none';
-    document.getElementById('loading_text').innerHTML = 'Aan het laden...';
-}
-
-
 
 function toggleContent() {
     const toggleSwitch = document.getElementById('toggleSwitch');

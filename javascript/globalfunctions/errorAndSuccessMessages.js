@@ -8,7 +8,6 @@ function runErrorMessage(message) {
     errorMessageText.innerHTML = message;
     errorMessageScreen.style.top = '80px'; // get element in view
     errorMessageScreen.style.opacity = '1'; // fade in
-    barcodeInputElement.value = '';
 
     // After the specified duration, hide the element and set timeoutId
     timeoutId = setTimeout(function () {
@@ -27,7 +26,7 @@ function runSuccesMessage(message) {
     succesMessageText.innerHTML = message;
     succesMessageScreen.style.top = '80px'; // get element in view
     succesMessageScreen.style.opacity = '1'; // fade in
-    barcodeInputElement.value = '';
+    
 
     // After the specified duration, hide the element and set timeoutId
     timeoutId = setTimeout(function () {
