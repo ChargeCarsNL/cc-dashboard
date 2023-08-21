@@ -72,4 +72,11 @@ window.addEventListener('DOMContentLoaded', function () {
         messageBox.innerHTML = ''; // Clear previous messages
         messageBox.appendChild(errorTextElement);
     }
+
+    function setHiddenTaskIdValue(taskid) {
+        const hiddenTaskIdField = document.getElementsByName('hidden_taskid')[0];
+        hiddenTaskIdField.value = taskid;
+        console.log(`Succesfully added taskid: ${taskid} to hidden field`);
+    }
+
 });
