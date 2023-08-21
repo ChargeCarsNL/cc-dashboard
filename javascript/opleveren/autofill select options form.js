@@ -122,7 +122,7 @@ window.addEventListener('load', async function () {
 });
 
 function removeAllOptions() {
-    const allSelectElements = document.querySelectorAll('select');
+    const allSelectElements = document.querySelectorAll(`[data-name*="${keyword}"]`);
     allSelectElements.forEach(selectElement => {
         while (selectElement.options.length > 0) {
             selectElement.remove(0);
