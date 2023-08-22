@@ -30,22 +30,42 @@ let unitClassLabelsArray = [];
 
 window.addEventListener('load', function () {
 
+    runLoadingScreen('Initialiseren...');
+    console.log('Loading page...');
     focusBarcodeInput();
 
     const url = 'https://prod-188.westeurope.logic.azure.com:443/workflows/c692d1e2c0494c1fad8e6eb43777380f/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=GLLeWlwV-sS7pgnipNEhZyJOEkodz534uhuDmzkbXfY';
-    // Verkrijg alle voorraad lijsten
+
     fetch(url, {
         method: 'GET'
     })
         .then(response => response.json())
-        .then(data => addListsToSelectInput(data))
-        .catch(error => console.error('Error:', error));
+        .then(data => {
+            addListsToSelectInput(data);
 
-    // Fetch the unit class items on page load
-    fetchUnitClassItems();
-
-    // Fetch the unit class labels on page load
-    fetchUnitSoortLabels();
+            // Fetch the unit class items
+            fetchUnitClassItems()
+                .then(() => {
+                    // Fetch the unit class labels
+                    fetchUnitSoortLabels()
+                        .then(() => {
+                            // Both fetch operations are complete, stop the loading screen
+                            stopLoadingScreen();
+                        })
+                        .catch(error => {
+                            console.error('Error fetching unit class labels:', error);
+                            stopLoadingScreen();
+                        });
+                })
+                .catch(error => {
+                    console.error('Error fetching unit class items:', error);
+                    stopLoadingScreen();
+                });
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            stopLoadingScreen();
+        });
 });
 
 // Voegt alle voorraden aan de voorraad select element toe
@@ -317,6 +337,9 @@ function toggleContent() {
 
 // Fetch unit class items
 async function fetchUnitClassItems() {
+
+    runLoadingScreen();
+
     const url = 'https://prod-22.westeurope.logic.azure.com:443/workflows/d875fde6360c45718337d4c7778500eb/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=_b2nff58zZzzOWefFZSQR1J-ARN7j6IgekgdqCBf1Ek';
 
     try {
@@ -324,12 +347,17 @@ async function fetchUnitClassItems() {
         const data = await response.json();
         unitClassItemsArray = data.tasks; // Update the unit class items array
         console.log('Unit class items fetched:', unitClassItemsArray);
+        stopLoadingScreen();
     } catch (error) {
         console.error('Error fetching unit class items:', error);
+        stopLoadingScreen();
     }
 }
 
 async function fetchUnitSoortLabels() {
+
+    runLoadingScreen();
+
     const unitClassItemsList = '900401619864';
     const url = `https://api.clickup.com/api/v2/list/${unitClassItemsList}/field`;
 
@@ -340,27 +368,31 @@ async function fetchUnitSoortLabels() {
             'Content-Type': 'application/json'
         }
     })
-    .then(responseData => {
-        console.log('Response data:', responseData);
+        .then(responseData => {
+            console.log('Response data:', responseData);
 
-        const customFieldId = "da66ae38-b086-437d-bba2-92cb9619c07c";
-        const customField = responseData.fields.find(field => field.id === customFieldId);
+            const customFieldId = "da66ae38-b086-437d-bba2-92cb9619c07c";
+            const customField = responseData.fields.find(field => field.id === customFieldId);
 
-        if (customField && customField.type === "drop_down") {
-            unitLabelSelect.innerHTML = '';
+            if (customField && customField.type === "drop_down") {
+                unitLabelSelect.innerHTML = '';
 
-            const options = customField.type_config.options;
-            for (const option of options) {
-                let newLabelOption = document.createElement('option');
-                newLabelOption.value = option.id;
-                newLabelOption.text = option.name;
-                unitLabelSelect.appendChild(newLabelOption);
+                const options = customField.type_config.options;
+                for (const option of options) {
+                    let newLabelOption = document.createElement('option');
+                    newLabelOption.value = option.id;
+                    newLabelOption.text = option.name;
+                    unitLabelSelect.appendChild(newLabelOption);
+                }
             }
-        }
-    })
-    .catch(error => {
-        console.error('Error fetching unit class labels:', error);
-    });
+
+            stopLoadingScreen();
+        })
+        .catch(error => {
+            console.error('Error fetching unit class labels:', error);
+            stopLoadingScreen();
+        });
+
 }
 
 
