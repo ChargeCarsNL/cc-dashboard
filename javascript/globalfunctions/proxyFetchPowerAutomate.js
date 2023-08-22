@@ -25,9 +25,11 @@ async function proxyFetch(url, requestObj) {
         if (!response.ok) {
             throw new Error(`Fetch failed with status ${response.status}`);
         }
-        const jsonResponse = await response.json();
-        console.log('Parsed response:', jsonResponse); // Voeg deze log toe
-        return jsonResponse;
+        const jsonResponse = await response.text();
+        const parsedResponse = JSON.parse(jsonResponse); // Parse the JSON data
+
+        console.log('Parsed response:', parsedResponse); // Voeg deze log toe
+        return parsedResponse;
     } catch (error) {
         console.error('Proxy fetch error:', error);
         throw error;
