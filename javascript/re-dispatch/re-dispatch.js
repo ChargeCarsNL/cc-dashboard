@@ -1,6 +1,6 @@
 window.addEventListener('DOMContentLoaded', function () {
 
-    const button = document.getElementById("cc_nummer_check_button");
+    const checkJobNumberButton = document.getElementById("cc_nummer_check_button");
     const messageBox = document.getElementById("message_box");
     messageBox.classList.add("message-box"); // Apply the message box container style
     messageBox.style.display = "none";
@@ -9,10 +9,12 @@ window.addEventListener('DOMContentLoaded', function () {
     const apiKey = "your-api-key"; // Replace with your actual API key
     const url = 'https://prod-86.westeurope.logic.azure.com:443/workflows/597c6ec246244650b9b4aab8bd45e87a/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=FJHndl9oqnpIvHeUDQ615IK26SKzEePM8-b7hXrFrh8';
 
-    button.addEventListener("click", function () {
+    checkJobNumberButton.addEventListener("click", function () {
         const filledCCNumber = document.getElementById("cc_nummer_veld").value.trim().toUpperCase();
-
+    
         if (filledCCNumber.length === 8 && filledCCNumber.startsWith("CC-")) {
+            runLoadingScreen('Fetching data...'); // Show loading screen before fetching
+    
             fetch(url, {
                 method: 'POST',
                 headers: {
@@ -21,9 +23,15 @@ window.addEventListener('DOMContentLoaded', function () {
                 },
                 body: JSON.stringify({ taskId: filledCCNumber }),
             })
-                .then(response => response.json())
-                .then(data => handleData(data))
-                .catch(error => console.error('Error:', error));
+            .then(response => response.json())
+            .then(data => {
+                handleData(data);
+                stopLoadingScreen(); // Fetching and data handling are complete, stop loading screen
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                stopLoadingScreen(); // In case of error, also stop loading screen
+            });
         } else {
             displayWarning("Het ingevoerde CC-nummer is onjuist / bestaat niet");
         }
