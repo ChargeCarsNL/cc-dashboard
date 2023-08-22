@@ -12,6 +12,7 @@ let succesMessageText = document.getElementById('succes_message_text');
 // Declare form fields
 let newUnitTextInput = document.getElementById('new_unit_text_input');
 let voorraadSelect = document.getElementById('voorraad_select');
+let unitLabelSelect = document.getElementById('unit_label_select');
 
 // Haal het barcode input element op
 let barcodeInputElement = document.getElementById('barcode_scanner_input');
@@ -21,7 +22,15 @@ let closeButtonNewUnitScreen = document.getElementById('close_button_new_unit_sc
 let unitToevoegenButton = document.getElementById('unit_toevoegen_button');
 let aanVoorraadToevoegenButton = document.getElementById('aan_voorraad_toevoegen_button');
 
+// Declare an empty array to store the unit class items
+let unitClassItemsArray = [];
+
+// Declare an empty array to store the unit class labels
+let unitClassLabelsArray = [];
+
 window.addEventListener('load', function () {
+
+    focusBarcodeInput();
 
     const url = 'https://prod-188.westeurope.logic.azure.com:443/workflows/c692d1e2c0494c1fad8e6eb43777380f/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=GLLeWlwV-sS7pgnipNEhZyJOEkodz534uhuDmzkbXfY';
     // Verkrijg alle voorraad lijsten
@@ -32,23 +41,29 @@ window.addEventListener('load', function () {
         .then(data => addListsToSelectInput(data))
         .catch(error => console.error('Error:', error));
 
-    function addListsToSelectInput(data) {
-        // Define voorraad select input
-        const voorraadSelect = document.getElementById('voorraad_select');
-        const voorraadLijstArray = data.lists;
-        console.log(`Voorraadlijst array: ${voorraadLijstArray}`);
+    // Fetch the unit class items on page load
+    fetchUnitClassItems();
 
-        for (let i = 0; i < voorraadLijstArray.length; i++) {
-            // Maak een nieuwe optie aan
-            let newVoorraadOption = document.createElement('option');
-            newVoorraadOption.value = voorraadLijstArray[i].id; // De waarde van de optie
-            newVoorraadOption.text = voorraadLijstArray[i].name; // De tekst die wordt weergegeven
-            // Voeg de nieuwe optie toe aan het select element
-            voorraadSelect.appendChild(newVoorraadOption);
-        }
-
-    }
+    // Fetch the unit class labels on page load
+    fetchUnitSoortLabels();
 });
+
+// Voegt alle voorraden aan de voorraad select element toe
+function addListsToSelectInput(data) {
+    // Define voorraad select input
+    const voorraadSelect = document.getElementById('voorraad_select');
+    const voorraadLijstArray = data.lists;
+    console.log(`Voorraadlijst array: ${voorraadLijstArray}`);
+
+    for (let i = 0; i < voorraadLijstArray.length; i++) {
+        // Maak een nieuwe optie aan
+        let newVoorraadOption = document.createElement('option');
+        newVoorraadOption.value = voorraadLijstArray[i].id; // De waarde van de optie
+        newVoorraadOption.text = voorraadLijstArray[i].name; // De tekst die wordt weergegeven
+        // Voeg de nieuwe optie toe aan het select element
+        voorraadSelect.appendChild(newVoorraadOption);
+    }
+}
 
 // -------------------event listeners-----------------------
 
@@ -78,7 +93,7 @@ barcodeInputElement.addEventListener('input', async function () {
                 }
             } else {
                 stopLoadingScreen();
-                console.log("Geannulleerd. Geen voorraad geselecteerd");
+                console.log('Geannulleerd. Geen voorraad geselecteerd');
                 barcodeInputElement.value = '';
                 runErrorMessage('Geen voorraad geselecteerd');
             }
@@ -89,15 +104,17 @@ barcodeInputElement.addEventListener('input', async function () {
     }
 });
 
-unitToevoegenButton.addEventListener("click", function () {
+unitToevoegenButton.addEventListener('click', function () {
     runLoadingScreen('Unit toevoegen aan database');
     // add filled unit to clickup list
 
     const scannedCode = barcodeInputElement.value;
     const filledValue = newUnitTextInput.value;
+    const selectedLabel = unitLabelSelect.value;
+
     if (filledValue.length > 0) {
         stopNewUnitScreen();
-        addItemToUnitClassList(scannedCode, filledValue)
+        addItemToUnitClassList(scannedCode, filledValue, selectedLabel)
     } else {
         barcodeInputElement.value = '';
         stopLoadingScreen();
@@ -106,7 +123,7 @@ unitToevoegenButton.addEventListener("click", function () {
     }
 });
 
-closeButtonNewUnitScreen.addEventListener("click", function () {
+closeButtonNewUnitScreen.addEventListener('click', function () {
     stopNewUnitScreen();
     console.log('closed');
 });
@@ -114,30 +131,20 @@ closeButtonNewUnitScreen.addEventListener("click", function () {
 //----------------------some functions-------------------------
 
 async function getUnitClass(scannedCode) {
-    const url = 'https://prod-22.westeurope.logic.azure.com:443/workflows/d875fde6360c45718337d4c7778500eb/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=_b2nff58zZzzOWefFZSQR1J-ARN7j6IgekgdqCBf1Ek';
+    const EANCodeCustomFieldId = '7bb86afc-301a-48ec-b618-a71b2afb6ebd';
+    console.log(`Current scannedCode: ${scannedCode}`);
 
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        const unitClassItemsArray = data.tasks;
-        const EANCodeCustomFieldId = '7bb86afc-301a-48ec-b618-a71b2afb6ebd';
-        console.log(`Current scannedCode: ${scannedCode}`);
+    for (let i = 0; i < unitClassItemsArray.length; i++) {
+        let customFieldsArray = unitClassItemsArray[i].custom_fields;
+        let EANCode = getCustomFieldValueById(customFieldsArray, EANCodeCustomFieldId);
+        console.log(`current code: ${EANCode}`);
 
-        for (let i = 0; i < unitClassItemsArray.length; i++) {
-            let customFieldsArray = unitClassItemsArray[i].custom_fields;
-            let EANCode = getCustomFieldValueById(customFieldsArray, EANCodeCustomFieldId);
-            console.log(`current code: ${EANCode}`);
-
-            if (EANCode == scannedCode) {
-                return unitClassItemsArray[i];
-            }
+        if (EANCode == scannedCode) {
+            return unitClassItemsArray[i];
         }
-        console.log(`returned null`);
-        return null;
-    } catch (error) {
-        console.error('Error:', error);
-        return null;
     }
+    console.log(`returned null`);
+    return null;
 }
 
 function getCustomFieldValueById(customFieldArray, customFieldId) {
@@ -150,9 +157,10 @@ function getCustomFieldValueById(customFieldArray, customFieldId) {
     return null; /*Return null if fieldId is not found*/
 }
 
-function addItemToUnitClassList(unitCode, unitName) {
+function addItemToUnitClassList(unitCode, unitName, unitLabel) {
     const url = 'https://prod-209.westeurope.logic.azure.com:443/workflows/3c068e70e83c486da13e0e35c501cb62/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=NgV77-5FgzXRKI9SdLDAC_-F0XQEvCtiCx1tOLqCYjY';
-    console.log(`item met code: ${unitCode} wordt aan lijst toegevoegd`)
+    console.log(`item met code: ${unitCode} wordt aan lijst toegevoegd`);
+
     fetch(url, {
         method: 'POST',
         headers: {
@@ -165,16 +173,24 @@ function addItemToUnitClassList(unitCode, unitName) {
     })
         .then(response => response.json())
         .then(data => {
+            // Call fetchUnitClassItems to update the unit class items array
+            fetchUnitClassItems();
+
+            // Call fetchUnitSoortLabels to update the unit class labels array
+            fetchUnitSoortLabels();
+
             barcodeInputElement.value = '';
             stopLoadingScreen();
             runSuccesMessage(`<strong>${unitName}</strong> toegevoegd aan bekende units`);
             console.log(`Unit met id:${data.created_item_id} toegevoegd aan lijst`);
+            focusBarcodeInput();
         })
         .catch(error => {
             barcodeInputElement.value = '';
             stopLoadingScreen();
             runErrorMessage(`Kon <strong>${unitName}</strong> niet toevoegen aan bekende units`);
             console.error('Error:', error);
+            focusBarcodeInput();
         });
 }
 
@@ -183,8 +199,8 @@ function addUnitToSelectedVoorraad(scannedCode, currentUnitClassItem, selectedIn
     const selectedOption = voorraadSelect.options[selectedIndex];
     // Krijg de waarde van het geselecteerde item
     const selectedVoorraad = {
-        "name": selectedOption.text,
-        "value": selectedOption.value
+        'name': selectedOption.text,
+        'value': selectedOption.value
     }
 
     console.log(`Unit is bekend: ${currentUnitClassItem.name}. Unit wordt toegevoegd aan ${selectedVoorraad.name}...`);
@@ -215,6 +231,7 @@ function addUnitToSelectedVoorraad(scannedCode, currentUnitClassItem, selectedIn
             // Clear barcode input field for new input
             barcodeInputElement.value = '';
             runSuccesMessage(`<strong>${unitClassName}</strong> succesvol toegevoegd aan ${selectedVoorraad.name}`);
+            focusBarcodeInput();
         })
         .catch(error => {
             console.error('Error:', error);
@@ -223,6 +240,7 @@ function addUnitToSelectedVoorraad(scannedCode, currentUnitClassItem, selectedIn
             // Clear barcode input field for new input
             barcodeInputElement.value = '';
             runErrorMessage(`<strong>${unitClassName}</strong> kon niet worden toegevoegd aan ${selectedVoorraad.name}`);
+            focusBarcodeInput();
         });
 }
 
@@ -233,7 +251,7 @@ function checkEANValidity(code) {
 
     // Controleer of de code 8 of 13 cijfers heeft
     if (code.length !== 8 && code.length !== 13) {
-        console.log("Ongeldige lengte: EAN-codes moeten 8 of 13 cijfers lang zijn.");
+        console.log('Ongeldige lengte: EAN-codes moeten 8 of 13 cijfers lang zijn.');
         return false;
     }
 
@@ -248,7 +266,7 @@ function checkEANValidity(code) {
 
         // Controleer of het controlecijfer overeenkomt met het laatste cijfer in de code
         if (checksum !== parseInt(code[code.length - 1])) {
-            console.log("Ongeldig controlecijfer voor EAN-8 code.");
+            console.log('Ongeldig controlecijfer voor EAN-8 code.');
             return false;
         }
     } else if (code.length === 13) {
@@ -262,7 +280,7 @@ function checkEANValidity(code) {
 
         // Controleer of het controlecijfer overeenkomt met het laatste cijfer in de code
         if (checksum !== parseInt(code[code.length - 1])) {
-            console.log("Ongeldig controlecijfer voor EAN-13 code.");
+            console.log('Ongeldig controlecijfer voor EAN-13 code.');
             return false;
         }
     }
@@ -287,12 +305,65 @@ function stopNewUnitScreen() {
 function toggleContent() {
     const toggleSwitch = document.getElementById('toggleSwitch');
     const content = document.getElementById('toggle_text');
-    
+
     if (toggleSwitch.checked) {
-      content.innerHTML = 'Voorraad uitboeken';
-      content.style.color = 'var(--bricks-color-fgyvlm)';
+        content.innerHTML = 'Voorraad uitboeken';
+        content.style.color = 'var(--bricks-color-fgyvlm)';
     } else {
-      content.innerHTML = 'Voorraad inboeken';
-      content.style.color = 'var(--bricks-color-coeckr)';
+        content.innerHTML = 'Voorraad inboeken';
+        content.style.color = 'var(--bricks-color-coeckr)';
     }
-  }
+}
+
+// Fetch unit class items
+async function fetchUnitClassItems() {
+    const url = 'https://prod-22.westeurope.logic.azure.com:443/workflows/d875fde6360c45718337d4c7778500eb/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=_b2nff58zZzzOWefFZSQR1J-ARN7j6IgekgdqCBf1Ek';
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        unitClassItemsArray = data.tasks; // Update the unit class items array
+        console.log('Unit class items fetched:', unitClassItemsArray);
+    } catch (error) {
+        console.error('Error fetching unit class items:', error);
+    }
+}
+
+async function fetchUnitSoortLabels() {
+    const unitClassItemsList = '900401619864';
+    const url = `https://api.clickup.com/api/v2/list/${unitClassItemsList}/field`;
+
+    return proxyFetch(url, {
+        method: 'GET',
+        headers: {
+            'Authorization': 'pk_38199608_RWBKIFPYH9LSP1DAR6ZLNJD2ZQP5IY4T',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(responseData => {
+        console.log('Response data:', responseData);
+
+        const customFieldId = "da66ae38-b086-437d-bba2-92cb9619c07c";
+        const customField = responseData.fields.find(field => field.id === customFieldId);
+
+        if (customField && customField.type === "drop_down") {
+            unitLabelSelect.innerHTML = '';
+
+            const options = customField.type_config.options;
+            for (const option of options) {
+                let newLabelOption = document.createElement('option');
+                newLabelOption.value = option.id;
+                newLabelOption.text = option.name;
+                unitLabelSelect.appendChild(newLabelOption);
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching unit class labels:', error);
+    });
+}
+
+
+function focusBarcodeInput() {
+    barcodeInputElement.focus();
+}
