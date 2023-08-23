@@ -46,6 +46,7 @@ window.addEventListener('DOMContentLoaded', function () {
             displayTaskFoundMessage(data.name);
             redispatchForm.style.display = "flex"; // Show the element
             setHiddenTaskIdValue(data.id);
+            setHiddenListIdValue(data.list.id);
         } else {
             displayWarning("Task name not found in data.");
         }
@@ -85,6 +86,12 @@ window.addEventListener('DOMContentLoaded', function () {
         const hiddenTaskIdField = document.getElementsByName('hidden_taskid')[0];
         hiddenTaskIdField.value = taskid;
         console.log(`Succesfully added taskid: ${taskid} to hidden field`);
+    }
+
+    function setHiddenListIdValue(listId) {
+        const hiddenListIdField = document.getElementsByName('hidden_listid')[0];
+        hiddenListIdField.value = listId;
+        console.log(`Succesfully added taskid: ${listId} to hidden field`);
     }
 
 });

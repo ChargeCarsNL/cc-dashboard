@@ -17,27 +17,40 @@
 
     .qr-code {
       text-align: center;
+      width: 40%;
+    }
+
+    .data {
+      width: 60%;
     }
 
     .main-container {
-      width: auto;
+      width: 100%;
       display: block;
     }
 
     .upper-container {
-      width: auto;
+      width: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
     .lower-container {
+      text-align: center;
     }
 
     p {
-      font-size: 6mm;
-      padding: 3mm;
+      font-size: 4mm;
+      padding: 1mm;
     }
+
+    h5 {
+      font-size: 5mm;
+      padding: 1mm
+    }
+
+
   </style>
 </head>
 
@@ -45,14 +58,14 @@
   <div class="main-container">
     <div class="upper-container">
       <div class="qr-code">
-        <img style="width: 65mm; height: 65mm"
+        <img style="width: 100%; height: auto"
           src="https://chart.googleapis.com/chart?cht=qr&chs=100x100&chl=@{triggerBody()?['payload']?['url']}"
           alt="QR Code">
       </div>
       <div class="data">
-        <p>@{outputs('opf_ref')}</p>
-        <p>@{outputs('opdrachtgever')}</p>
-        <p>@{outputs('product')}</p>
+        <h5>@{variables('opdref')}</h5>
+        <h5>@{outputs('opdrachtgever')}</h5>
+        <p>@{outputs('product')} | <strong>@{outputs('montage')}</strong></p>
       </div>
     </div>
     <div class="lower-container">
