@@ -1,4 +1,6 @@
 window.addEventListener('load', function () {
+
+    runLoadingScreen();
     const apiKey = '15c34515-3bfb-47fb-9a4c-b39de6822ca5';
     const taskId = new URLSearchParams(window.location.search).get('taskid');
 
@@ -82,8 +84,8 @@ window.addEventListener('load', function () {
 
         checkWerkbonnenCompleteness(werkbonnenBenodigd, verstuurdeWerkbonnenArray);
 
-        const loadingFrame = document.getElementById("loadingFrame");
-        loadingFrame.style.display = "none";
+        stopLoadingScreen();
+
     }
 
     // Functie die controleert of alle werkbonnen zijn ingevuld
