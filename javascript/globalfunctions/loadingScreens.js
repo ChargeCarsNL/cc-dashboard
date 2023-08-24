@@ -1,35 +1,40 @@
 function runLoadingScreen(message) {
-
     const brixContent = document.getElementById('brx-content');
-
-    if (document.getElementById('brx-content')) {
-
-        brixContent.style.display = 'none';
-
+    if (brixContent) {
+        brixContent.style.opacity = 0; // Begin met volledig transparant
     }
 
-    console.log(`Aan het laden...`);
     const loadingScreen = document.getElementById('loading_screen');
     loadingScreen.style.display = 'flex';
+
+    const loadingText = document.getElementById('loading_text');
     if (message && message.length > 0) {
-        document.getElementById('loading_text').innerHTML = message;
+        loadingText.innerHTML = message;
     } else {
-        document.getElementById('loading_text').innerHTML = 'Aan het laden...';
+        loadingText.innerHTML = 'Aan het laden...';
     }
+
+    // Fade in
+    loadingScreen.style.opacity = 1; // Zet de laadachtergrond op volledige dekking
+    loadingText.style.opacity = 1; // Zet de tekst op volledige dekking
 }
 
-
 function stopLoadingScreen() {
-
     const brixContent = document.getElementById('brx-content');
-
-    if (document.getElementById('brx-content')) {
-
-        brixContent.style.display = 'block';
-
+    if (brixContent) {
+        brixContent.style.opacity = 1; // Herstel de content naar volledige dekking
     }
 
     const loadingScreen = document.getElementById('loading_screen');
-    loadingScreen.style.display = 'none';
-    document.getElementById('loading_text').innerHTML = '';
+    const loadingText = document.getElementById('loading_text');
+
+    // Fade uit
+    loadingScreen.style.opacity = 0; // Maak de laadachtergrond transparant
+    loadingText.style.opacity = 0; // Maak de tekst transparant
+
+    // Wacht tot de fade-out is voltooid en verberg dan het laadscherm
+    setTimeout(() => {
+        loadingScreen.style.display = 'none';
+        loadingText.innerHTML = '';
+    }, 500); // Wacht 0,5 seconden voor de fade-out (pas dit aan naar je voorkeur)
 }

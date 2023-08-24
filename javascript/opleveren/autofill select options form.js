@@ -1,8 +1,20 @@
 let laadpaalSoortenObj = null;
 
+runLoadingScreen();
+
+initializeCode();
+
+async function initializeCode () {
+    console.log('Page loaded.');
+    await fetchLaadpaalSoorten();
+    removeAllOptions(); // Trigger to remove all options
+    setEventListenersForRepeaterButtons(); // Attach initial event listeners
+    autoFillLaadpalen();
+};
+
+
 // Function to get laadpaalSoorten data
 async function fetchLaadpaalSoorten() {
-    
     if (!laadpaalSoortenObj) {
         laadpaalSoortenObj = await getLaadpaalSoorten();
     }
@@ -10,17 +22,11 @@ async function fetchLaadpaalSoorten() {
 }
 
 async function autoFillLaadpalen() {
-
     const keyword = 'repeater_field_3_0';
     const selectElementsWithKeyword = document.querySelectorAll(`[data-name*="${keyword}"]`);
 
-    console.log('Selected elements:', selectElementsWithKeyword);
-
-    console.log('Select elements with keyword:', selectElementsWithKeyword);
-
     const laadpaalSoortenObj = await fetchLaadpaalSoorten();
 
-    console.log('Laadpaal soorten object:', laadpaalSoortenObj);
 
     if (laadpaalSoortenObj.tasks && laadpaalSoortenObj.tasks.length > 0) {
         const options = laadpaalSoortenObj.tasks.map(soort => {
@@ -58,13 +64,15 @@ async function autoFillLaadpalen() {
                 selectElement.appendChild(newOption);
                 console.log(option.name, ' option created');
             });
-
-            // Set no option as selected
-            selectElement.selectedIndex = -1;
-
         });
 
-    } 
+        stopLoadingScreen();
+
+    } else {
+
+        stopLoadingScreen();
+        
+    }
 }
 
 async function getLaadpaalSoorten() {
@@ -107,10 +115,8 @@ function removeOptionsExceptSelected(selectElement) {
 // Function to set the flag when "Repeat" button is clicked
 function attachAutoFillListener(button) {
     button.addEventListener('click', function () {
-        hideMainFormSection();
         console.log('Repeat button clicked.');
         setTimeout(autoFillLaadpalen, 500);
-        showMainFormSection();
     });
 }
 
@@ -121,20 +127,6 @@ function setEventListenersForRepeaterButtons() {
     Array.from(repeatButtons).forEach(attachAutoFillListener);
 }
 
-// Run the autoFillLaadpalen() function when page is loaded
-window.addEventListener('load', async function () {
-
-    hideMainFormSection();
-
-    console.log('Page loaded.');
-    await fetchLaadpaalSoorten();
-    removeAllOptions(); // Trigger to remove all options
-    autoFillLaadpalen();
-    setEventListenersForRepeaterButtons(); // Attach initial event listeners
-
-    showMainFormSection();
-});
-
 function removeAllOptions() {
     const keyword = 'repeater_field_3_0';
     const allSelectElements = document.querySelectorAll(`[data-name*="${keyword}"]`);
@@ -143,14 +135,4 @@ function removeAllOptions() {
             selectElement.remove(0);
         }
     });
-}
-
-function hideMainFormSection() {
-    runLoadingScreen();
-    document.getElementById('main_form_section').style.display = 'none';
-}
-
-function showMainFormSection() {
-    document.getElementById('main_form_section').style.display = 'flex';
-    stopLoadingScreen();
 }

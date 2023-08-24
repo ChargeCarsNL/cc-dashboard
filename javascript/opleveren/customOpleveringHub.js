@@ -204,13 +204,15 @@ window.addEventListener('load', function () {
                 return [serviceWerkbonId];
             case "b97556bd-c6ee-4bcd-8a26-37e866b15221"/*Demontage*/:
                 return [demontageWerkbonId];
-            case "0d71a148-70ac-4a4b-b0c6-f088c94fb6ed"/*Demontage en afmontage*/:
-                return [lmraWerkbonId, demontageWerkbonId, installatieWerkbonId];
+            case "0d71a148-70ac-4a4b-b0c6-f088c94fb6ed"/*Vervaning*/:
+                return [serviceWerkbonId];
+            case "f23ece47-dd9f-4ec7-8dc1-101e31fedf86"/*Afmontage*/:
+                return [serviceWerkbonId];
             default:
                 return [];
         }
     }
-
+    
     function updateChildElements(id, verstuurdeWerkbonnenArray, werkbonnenBenodigd) {
         const trueChild = document.getElementById(`true${id}`);
         const falseChild = document.getElementById(`false${id}`);

@@ -122,11 +122,20 @@ table.ff_repeater_table td {
     border-bottom: 1px solid #ced0d4;
 }
 
+/*------- Fluentform signature pads -------*/
+
 .fluentform-signature-pad {
     background-color: #fbfbfb !important;
     border: 1px dashed #dadbdd !important;
     border-radius: 10px;
     width: 300px;
+}
+
+.fluentform-signature-hint,
+.fluentform-signature-pad-actions {
+    margin-top: -50px;
+    margin-left: 20px;
+    font-size: 16px !important;
 }
 
 .repeat-minus svg,
@@ -192,3 +201,29 @@ table.ff_flexible_table.ff-checkable-grids tbody tr {
 .brxe-button:hover {
     background-color: #0056b3;
 }
+
+/*------- Loading screen fade animations ---------*/
+
+#brx-content {
+    /* Je huidige stijlen voor brx-content */
+    transition: opacity 0.5s ease;
+    /* Voeg een overgang toe voor het vervagen van de content */
+}
+
+#loading_screen {
+    /* Je huidige stijlen voor loading_screen */
+    opacity: 0;
+    /* Begin met een transparant laadscherm */
+    transition: opacity 0.5s ease;
+    /* Voeg een overgang toe voor het vervagen van het laadscherm */
+}
+
+#loading_text {
+    /* Je huidige stijlen voor loading_text */
+    opacity: 0;
+    /* Begin met een transparante tekst */
+    transition: opacity 0.5s ease;
+    /* Voeg een overgang toe voor het vervagen van de tekst */
+}
+
+/* End loading screen fade animations */
