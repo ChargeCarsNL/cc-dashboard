@@ -1,0 +1,194 @@
+body {
+    min-height: 100vh;
+}
+
+.frm-fluent-form input[type="radio"],
+.frm-fluent-form input[type="checkbox"] {
+    width: auto;
+    border: none !important;
+    transform: scale(1.2);
+    top: -1px !important;
+    color: transparent;
+    accent-color: var(--bricks-color-coeckr) !important;
+    margin-right: 10px !important;
+    margin-bottom: 20px;
+}
+
+.frm-fluent-form .ff-el-form-check,
+.ff_repeater_table .ff-el-form-control,
+ff-el-form-control select,
+.fluentform .ff_upload_btn.ff-btn {
+    max-width: 320px;
+    padding-left: 10px;
+    color: var(--bricks-color-fgyvlm) !important;
+    border: 1px dashed var(--bricks-text-light);
+    border-radius: 10px;
+    margin: 10px 0px !important;
+    background: none !important;
+}
+
+.frm-fluent-form .ff_item_selected {
+    background: var(--bricks-color-bgpopo) !important;
+    border: 2px solid var(--bricks-color-coeckr);
+}
+
+.frm-fluent-form .ff_item_selected span {
+    color: var(--bricks-color-coeckr);
+}
+
+.frm-fluent-form .ff-el-form-check-label {
+    margin-bottom: 0px !important;
+    padding: 10px 0px;
+    vertical-align: middle;
+}
+
+.frm-fluent-form input[type="text"],
+.frm-fluent-form input[type="number"],
+.frm-fluent-form select {
+    border-radius: 6px !important;
+    border: 1px solid var(--bricks-text-light);
+    height: 45px !important;
+}
+
+.frm-fluent-form h1,
+.frm-fluent-form h2,
+.frm-fluent-form h3,
+.frm-fluent-form h4,
+.frm-fluent-form h5,
+.frm-fluent-form h6 {
+    color: var(--bricks-color-fgyvlm);
+    margin-top: 20px;
+}
+
+.frm-fluent-form select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    -ms-appearance: none;
+    background-color: #fff;
+    height: 45px !important;
+    border-radius: 6px !important;
+    box-shadow: 0px 1px 8px -4px var(--bricks-color-paadnj) !important;
+}
+
+.scheiding-lijn {
+    border-top: 1px solid var(--bricks-color-iniwjo);
+    margin: 10px 0;
+}
+
+/* Style for message box container */
+.message-box {
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 5px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.success-message {
+    color: var(--bricks-color-coeckr);
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.error-message,
+.warning-message {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.error-message {
+    color: red;
+}
+
+.warning-message {
+    color: orange;
+}
+
+.ff-column-container {
+    border: 1px dashed #ced0d4;
+    margin: 30px 0;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+table.ff_repeater_table td {
+    width: auto !important;
+}
+
+.ff-section_break_desk {
+    padding-bottom: 20px;
+    border-bottom: 1px solid #ced0d4;
+}
+
+.fluentform-signature-pad {
+    background-color: #fbfbfb !important;
+    border: 1px dashed #dadbdd !important;
+    border-radius: 10px;
+    width: 300px;
+}
+
+.repeat-minus svg,
+.repeat-plus svg {
+    width: 35px !important;
+    height: 35px !important;
+    filter: brightness(0) saturate(100%) invert(65%) sepia(7%) saturate(13%) hue-rotate(352deg) brightness(98%) contrast(82%);
+}
+
+table.ff_flexible_table.ff-checkable-grids tbody tr {
+    border-radius: 10px !important;
+    overflow: hidden;
+}
+
+.custom_warning_message {
+    background-color: #f0ad4e;
+    color: #fff;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+#jobinfo p {
+    margin-bottom: 0px;
+}
+
+.ff-el-group {
+    margin-top: 30px;
+}
+
+.fluentform .ff_btn_style {
+    background-color: var(--bricks-color-fgyvlm) !important;
+    color: #fff !important;
+}
+
+.p-button {
+    padding: 15px;
+    font-size: 18px;
+    background-color: var(--bricks-color-fgyvlm);
+}
+
+/*Custom button styling bricks*/
+.brxe-button {
+    display: inline-block;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+/* Stijl voor de achtergrond van de knoppen in de primaire kleur */
+.bricks-background-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+/* Wanneer je over de knop hovert */
+.brxe-button:hover {
+    background-color: #0056b3;
+}
