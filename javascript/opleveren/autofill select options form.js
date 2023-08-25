@@ -4,14 +4,13 @@ runLoadingScreen();
 
 initializeCode();
 
-async function initializeCode () {
+async function initializeCode() {
     console.log('Page loaded.');
     await fetchLaadpaalSoorten();
     removeAllOptions(); // Trigger to remove all options
     setEventListenersForRepeaterButtons(); // Attach initial event listeners
     autoFillLaadpalen();
-};
-
+}
 
 // Function to get laadpaalSoorten data
 async function fetchLaadpaalSoorten() {
@@ -27,7 +26,6 @@ async function autoFillLaadpalen() {
 
     const laadpaalSoortenObj = await fetchLaadpaalSoorten();
 
-
     if (laadpaalSoortenObj.tasks && laadpaalSoortenObj.tasks.length > 0) {
         const options = laadpaalSoortenObj.tasks.map(soort => {
             return {
@@ -42,10 +40,8 @@ async function autoFillLaadpalen() {
             'value': 'Anders'
         });
 
-        // Sort options alphabetically by name, except for "Anders"
+        // Sorteer opties op alfabetische volgorde op naam
         options.sort((a, b) => {
-            if (a.name === 'Anders') return 1; // Move "Anders" to the end
-            if (b.name === 'Anders') return -1;
             return a.name.localeCompare(b.name);
         });
 
@@ -57,6 +53,11 @@ async function autoFillLaadpalen() {
                 selectElement.remove(0);
             }
 
+            // Voeg een lege standaardoptie toe
+            const emptyOption = document.createElement('option');
+            emptyOption.value = '';
+            selectElement.appendChild(emptyOption);
+
             options.forEach(option => {
                 const newOption = document.createElement('option');
                 newOption.value = option.value;
@@ -64,14 +65,14 @@ async function autoFillLaadpalen() {
                 selectElement.appendChild(newOption);
                 console.log(option.name, ' option created');
             });
+
+            // Stel de lege optie in als geselecteerd
+            selectElement.selectedIndex = 0;
         });
 
         stopLoadingScreen();
-
     } else {
-
         stopLoadingScreen();
-        
     }
 }
 
