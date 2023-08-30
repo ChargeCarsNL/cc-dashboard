@@ -128,7 +128,8 @@ table.ff_repeater_table td {
     background-color: #fbfbfb !important;
     border: 1px dashed #dadbdd !important;
     border-radius: 10px;
-    width: 300px;
+    width: 100%;
+    max-width: 380px !important;
 }
 
 .fluentform-signature-hint,
