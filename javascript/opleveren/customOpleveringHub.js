@@ -69,18 +69,29 @@ window.addEventListener('load', function () {
 
         const werkbonnenBenodigd = getWerkbonnenBenodigd(data);
 
-        // display buttons based on requirements
-        werkbonnenArray.forEach(id => {
-            updateChildElements(id, verstuurdeWerkbonnenArray, werkbonnenBenodigd);
-            addHrefToElement(id, jobObj);
-        });
-
         // hide lmra if not required
         const lmraSection = document.getElementById("section39ce6e14-6b51-42f9-80bd-10ff8b74bd1e");
 
         if (werkbonnenBenodigd.includes(lmraWerkbonId)) {
             lmraSection.style.display = 'flex';
+            /*
+            // Check if the specified ID is NOT present in the verstuurdeWerkbonnenArray
+            if (!verstuurdeWerkbonnenArray.includes("39ce6e14-6b51-42f9-80bd-10ff8b74bd1e")) {
+                const werkbonFormulierenSectie = document.getElementById("werkbon_formulieren_sectie");
+                werkbonFormulierenSectie.style.filter = "blur(0.2rem)";
+                werkbonFormulierenSectie.style.pointerEvents = "none";
+                // Toon LMRA warning text
+                const lmraWarningText = document.getElementById('lmra_warning_text');
+                lmraWarningText.style.display = 'flex';
+            }
+            */
         };
+
+        // display buttons based on requirements
+        werkbonnenArray.forEach(id => {
+            updateChildElements(id, verstuurdeWerkbonnenArray, werkbonnenBenodigd);
+            addHrefToElement(id, jobObj);
+        });
 
         checkWerkbonnenCompleteness(werkbonnenBenodigd, verstuurdeWerkbonnenArray);
 
@@ -212,7 +223,7 @@ window.addEventListener('load', function () {
                 return [];
         }
     }
-    
+
     function updateChildElements(id, verstuurdeWerkbonnenArray, werkbonnenBenodigd) {
         const trueChild = document.getElementById(`true${id}`);
         const falseChild = document.getElementById(`false${id}`);
