@@ -74,7 +74,6 @@ window.addEventListener('load', function () {
 
         if (werkbonnenBenodigd.includes(lmraWerkbonId)) {
             lmraSection.style.display = 'flex';
-<<<<<<< HEAD
             
             // Check if the specified ID is NOT present in the verstuurdeWerkbonnenArray
             if (!verstuurdeWerkbonnenArray.includes("39ce6e14-6b51-42f9-80bd-10ff8b74bd1e")) {
@@ -85,19 +84,6 @@ window.addEventListener('load', function () {
                 const lmraWarningText = document.getElementById('lmra_warning_text');
                 lmraWarningText.style.display = 'flex';
             }
-=======
-            /*
-            // Check if the specified ID is NOT present in the verstuurdeWerkbonnenArray
-            if (!verstuurdeWerkbonnenArray.includes("39ce6e14-6b51-42f9-80bd-10ff8b74bd1e")) {
-                const werkbonFormulierenSectie = document.getElementById("werkbon_formulieren_sectie");
-                werkbonFormulierenSectie.style.filter = "blur(0.2rem)";
-                werkbonFormulierenSectie.style.pointerEvents = "none";
-                // Toon LMRA warning text
-                const lmraWarningText = document.getElementById('lmra_warning_text');
-                lmraWarningText.style.display = 'flex';
-            }
-            */
->>>>>>> f21586e923596b115b9a60ed19d3b8d3ef8b0b35
         };
 
         // display buttons based on requirements
