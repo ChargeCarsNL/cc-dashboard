@@ -7,7 +7,7 @@ function runLoadingScreen(message) {
     }
 
     const loadingScreen = document.getElementById('loading_screen');
-    loadingScreen.style.display = 'flex';
+    loadingScreen.style.top = '-100vh';
     loadingScreen.style.zIndex = 99; // Zet z-index op 99 als het laadscherm zichtbaar is
 
     const loadingText = document.getElementById('loading_text');
@@ -38,7 +38,7 @@ function stopLoadingScreen() {
 
     // Wacht tot de fade-out is voltooid en verberg dan het laadscherm
     setTimeout(() => {
-        loadingScreen.style.display = 'none !imoportant';
+        loadingScreen.style.top = '-100vh';
         loadingScreen.style.zIndex = -1; // Zet z-index op 0 als het laadscherm verborgen is
         loadingText.innerHTML = '';
     }, 500); // Wacht 0,5 seconden voor de fade-out (pas dit aan naar je voorkeur)
