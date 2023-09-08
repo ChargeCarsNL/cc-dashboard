@@ -42,22 +42,26 @@
 
     p {
       font-size: 4mm;
-      padding: 0.8mm;
+      padding: 0.5mm;
     }
 
     h5 {
       font-size: 5mm;
-      padding: 0.8mm
+      padding: 0.5mm;
     }
 
-    .data:after {
-    content: 'paalmontage';
-    background-color: gray;
-    color: white;
-    padding: 2px;
-    border-radius: 3px;
-    margin-left: 5px;
-  }
+    .montage {
+      font-weight: bold;
+    }
+
+    .paalmontage {
+      background-color: black;
+      color: white;
+    }
+
+    .wandmontage {
+
+    }
 
 
   </style>
@@ -75,7 +79,7 @@
         <h5>@{variables('opdref')}</h5>
         <h5>@{outputs('opdrachtgever')}</h5>
         <h5>@{outputs('duedate')}</h5>
-        <p>@{outputs('product')} | <strong>@{outputs('montage')}</strong></p>
+        <p>@{outputs('product')} | <span class="montage @{toLower(outputs('montage'))}">@{outputs('montage')}</span></p>
       </div>
     </div>
     <div class="lower-container">
