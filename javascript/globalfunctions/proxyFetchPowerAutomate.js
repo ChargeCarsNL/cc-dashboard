@@ -13,7 +13,12 @@ async function proxyFetch(url, requestObj) {
     requestObj.headers.url = url;
 
     const headers = requestObj.headers;
-    const body = requestObj.body;
+
+    const body = '';
+
+    if (requestObj.body) {
+        body = requestObj.body;
+    }
 
     requestObj.method = 'POST';
 

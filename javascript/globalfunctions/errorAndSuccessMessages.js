@@ -1,3 +1,12 @@
+window.addEventListener('load', function () {
+
+    let errorMessageScreen = document.getElementById('error_message_screen');
+    let errorMessageText = document.getElementById('error_message_text');
+    let succesMessageScreen = document.getElementById('succes_message_screen');
+    let succesMessageText = document.getElementById('succes_message_text');
+
+});
+
 function runErrorMessage(message) {
     // Annuleer het vorige timeout als het bestaat
     if (timeoutId) {
@@ -26,7 +35,7 @@ function runSuccesMessage(message) {
     succesMessageText.innerHTML = message;
     succesMessageScreen.style.top = '80px'; // get element in view
     succesMessageScreen.style.opacity = '1'; // fade in
-    
+
 
     // After the specified duration, hide the element and set timeoutId
     timeoutId = setTimeout(function () {

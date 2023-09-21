@@ -34,6 +34,8 @@ window.addEventListener('load', function () {
     console.log('Loading page...');
     focusBarcodeInput();
 
+    addListsToVoorraadInput();
+
     const url = 'https://prod-188.westeurope.logic.azure.com:443/workflows/c692d1e2c0494c1fad8e6eb43777380f/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=GLLeWlwV-sS7pgnipNEhZyJOEkodz534uhuDmzkbXfY';
 
     fetch(url, {
@@ -41,7 +43,6 @@ window.addEventListener('load', function () {
     })
         .then(response => response.json())
         .then(data => {
-            addListsToSelectInput(data);
 
             // Fetch the unit class items
             fetchUnitClassItems()
@@ -69,19 +70,46 @@ window.addEventListener('load', function () {
 });
 
 // Voegt alle voorraden aan de voorraad select element toe
-function addListsToSelectInput(data) {
+async function addListsToVoorraadInput() {
     // Define voorraad select input
     const voorraadSelect = document.getElementById('voorraad_select');
-    const voorraadLijstArray = data.lists;
+    const voorraadLijstArray = await getVoorraden();
     console.log(`Voorraadlijst array: ${voorraadLijstArray}`);
 
     for (let i = 0; i < voorraadLijstArray.length; i++) {
         // Maak een nieuwe optie aan
         let newVoorraadOption = document.createElement('option');
         newVoorraadOption.value = voorraadLijstArray[i].id; // De waarde van de optie
-        newVoorraadOption.text = voorraadLijstArray[i].name; // De tekst die wordt weergegeven
+        newVoorraadOption.text = voorraadLijstArray[i].title; // De tekst die wordt weergegeven
         // Voeg de nieuwe optie toe aan het select element
         voorraadSelect.appendChild(newVoorraadOption);
+    }
+}
+
+// Verkrijg alle voorraden via api
+async function getVoorraden() {
+    const voorradenAppId = '650a2861377fce85c34dbead';
+    const fetchVoorradenUrl = `https://app.smartsuite.com/api/v1/applications/${voorradenAppId}/records/list/`;
+
+    try {
+        const response = await proxyFetch(fetchVoorradenUrl, {
+            method: 'POST',
+            headers: {
+                'Account-Id': accountId, // Deze waarden worden in Init.js geinitialiseerd
+                'test': 'testheader',
+                'Authorization': smartsuiteApiKey
+            }
+        });
+
+        console.log('Response:', response);  // Log the response
+
+        const data = await response;
+        const voorraadArray = data.items;
+
+        return voorraadArray;
+    } catch (error) {
+        console.error('Error fetching voorraden:', error);
+        throw error; // Rethrow the error for handling at a higher level
     }
 }
 
