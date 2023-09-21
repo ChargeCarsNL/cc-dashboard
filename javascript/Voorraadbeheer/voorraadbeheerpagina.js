@@ -3,12 +3,6 @@
 let newUnitScreen = document.getElementById('new_unit_screen');
 newUnitScreen.style.display = 'none';
 
-
-let errorMessageScreen = document.getElementById('error_message_screen');
-let errorMessageText = document.getElementById('error_message_text');
-let succesMessageScreen = document.getElementById('succes_message_screen');
-let succesMessageText = document.getElementById('succes_message_text');
-
 // Declare form fields
 let newUnitTextInput = document.getElementById('new_unit_text_input');
 let voorraadSelect = document.getElementById('voorraad_select');
@@ -29,6 +23,12 @@ let unitClassItemsArray = [];
 let unitClassLabelsArray = [];
 
 window.addEventListener('load', function () {
+
+    intializePage();
+
+});
+
+function intializePage() {
 
     runLoadingScreen('Initialiseren...');
     console.log('Loading page...');
@@ -67,7 +67,7 @@ window.addEventListener('load', function () {
             console.error('Error:', error);
             stopLoadingScreen();
         });
-});
+}
 
 // Voegt alle voorraden aan de voorraad select element toe
 async function addListsToVoorraadInput() {
@@ -85,6 +85,8 @@ async function addListsToVoorraadInput() {
         voorraadSelect.appendChild(newVoorraadOption);
     }
 }
+
+// verkrijg alle monteurs
 
 // Verkrijg alle voorraden via api
 async function getVoorraden() {
