@@ -1,11 +1,7 @@
-window.addEventListener('load', function () {
-
-    let errorMessageScreen = document.getElementById('error_message_screen');
-    let errorMessageText = document.getElementById('error_message_text');
-    let succesMessageScreen = document.getElementById('succes_message_screen');
-    let succesMessageText = document.getElementById('succes_message_text');
-
-});
+let errorMessageScreen = document.getElementById('error_message_screen');
+let errorMessageText = document.getElementById('error_message_text');
+let succesMessageScreen = document.getElementById('succes_message_screen');
+let succesMessageText = document.getElementById('succes_message_text');
 
 function runErrorMessage(message) {
     // Annuleer het vorige timeout als het bestaat
