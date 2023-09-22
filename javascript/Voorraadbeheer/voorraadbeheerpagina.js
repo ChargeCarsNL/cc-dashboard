@@ -91,6 +91,20 @@ async function addListsToVoorraadInput() {
         // Voeg de nieuwe optie toe aan het select element
         voorraadSelect.appendChild(newVoorraadOption);
     }
+
+    // laat de pagina luisteren naar voorraad aanpassingen en wanneer waardekamer voorraad wordt geselecteerd is het "eigenaar" select field geactiveerd
+    voorraadSelect.addEventListener('change', function () {
+        const selectedVoorraadId = voorraadSelect.value;
+
+        // Controleren of de geselecteerde voorraad overeenkomt met het gewenste voorraadId
+        if (selectedVoorraadId === '650b2ad695fd5e0df54858f8') {
+            // Als het overeenkomt, weergeef het andere select element
+            document.getElementById('eigenaar_select').style.display = 'block';
+        } else {
+            // Verberg het andere select element als het niet overeenkomt
+            document.getElementById('eigenaar_select').style.display = 'none';
+        }
+    });
 }
 
 // verkrijg alle monteurs
@@ -123,9 +137,21 @@ async function getVoorraden() {
 
 // -------------------event listeners-----------------------
 
-// Voeg een event listener toe voor het 'input' event
-barcodeInputElement.addEventListener("input", async function () {
+let barcodeDelayTimer;
 
+// Voeg een event listener toe voor het 'input' event
+barcodeInputElement.addEventListener("input", function (event) {
+
+    clearTimeout(barcodeDelayTimer); // Reset de timer bij elke nieuwe input
+
+    // Start een timer om de barcode als compleet te beschouwen na 500 milliseconden inactiviteit
+    barcodeDelayTimer = setTimeout(function () {
+        runBarCode(); // Roep de functie aan om de barcode te verwerken
+    }, 500);
+
+});
+
+async function runBarCode() {
     // Korte pauze van 250 milliseconden (kwart seconde)
     await new Promise((resolve) => setTimeout(resolve, 250));
 
@@ -164,7 +190,7 @@ barcodeInputElement.addEventListener("input", async function () {
         barcodeInputElement.value = "";
         runErrorMessage(`EAN code: <strong>${scannedCode}</strong> is ongeldig`);
     }
-});
+}
 
 unitToevoegenButton.addEventListener("click", function () {
     runLoadingScreen("Unit toevoegen aan database");
