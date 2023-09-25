@@ -6,7 +6,7 @@ newUnitScreen.style.display = "none";
 // Declare form fields
 let newUnitTextInput = document.getElementById("new_unit_text_input");
 let voorraadSelect = document.getElementById("voorraad_select");
-let eigenaarSelect = document.getElementById("eigenaar_select");
+let userSelect = document.getElementById("eigenaar_select");
 let unitLabelSelect = document.getElementById("unit_label_select");
 
 // Haal het barcode input element op
@@ -19,14 +19,17 @@ let aanVoorraadToevoegenButton = document.getElementById("aan_voorraad_toevoegen
 
 // Declare an empty array to store the unit class items
 let voorraadArtikelArray = [];
+
+// Declare variables
 let currentVoorraad = {};
+let currentUser = {};
 
 window.addEventListener("load", function () {
     runLoadingScreen("Initialiseren...");
     console.log("Loading page...");
 
     // verstop eigenaar select veld
-    eigenaarSelect.style.display = "none";
+    userSelect.style.display = "none";
 
     updateVoorraadArtikelen();
     addListsToVoorraadInput();
@@ -103,7 +106,7 @@ async function updateMonteurs() {
         newUserOption.value = currentUser; // De waarde van de optie (user object)
         newUserOption.text = currentUser.title; // De tekst die wordt weergegeven
         // Voeg de nieuwe optie toe aan het select element
-        eigenaarSelect.appendChild(newUserOption);
+        userSelect.appendChild(newUserOption);
     }
 }
 
@@ -186,20 +189,34 @@ barcodeInputElement.addEventListener("input", function (event) {
 
     // Start een timer om de barcode als compleet te beschouwen na 500 milliseconden inactiviteit
     barcodeDelayTimer = setTimeout(function () {
-        runBarCode(); // Roep de functie aan om de barcode te verwerken
+        runBarCode(barcodeInputElement.value); // Roep de functie aan om de barcode te verwerken
     }, 500);
 });
 
 // laat de pagina luisteren naar voorraad aanpassingen en wanneer waardekamer voorraad wordt geselecteerd is het "eigenaar" select field geactiveerd
 voorraadSelect.addEventListener("change", function () {
-    // Controleren of de geselecteerde voorraad overeenkomt met het gewenste voorraadId
-    if (selectedVoorraadId === "650b2ad695fd5e0df54858f8") {
+
+    selectedIndex = voorraadSelect.selectedIndex;
+    currentVoorraad = voorraadSelect.options[selectedIndex].value;
+
+    // Controleren welke uitboekmethode de voorraad heeft en stel de variabele waarde hiervoor in
+    if (selectedVoorraad.sad8d17120 /*uitboekmethode*/ === "793b08e9-f7e9-44f2-8f00-2186c64295d2" /*op naam*/) {
         // Als het overeenkomt, weergeef het andere select element
-        document.getElementById("eigenaar_select").style.display = "block";
-    } else {
-        // Verberg het andere select element als het niet overeenkomt
-        document.getElementById("eigenaar_select").style.display = "none";
+        document.getElementById("eigenaar_select").style.display = "block"; // show userSelect
+        uitboekMethode = 'op naam';
+    } else if (selectedVoorraad.sad8d17120 /*uitboekmethode*/ === "a8688371-2737-4a0f-8359-5fd6b788234c" /*op klus*/) {
+        // Verberg het userSelect element als het niet overeenkomt
+        uitboekMethode = 'op klus';
+        document.getElementById("eigenaar_select").style.display = "none"; // hide userSelect
     }
+});
+
+// luisten naar aanpassingen in het userSelect field en wijzig de currentuser variabele
+userSelect.addEventListener('change', function () {
+
+    selectedIndex = userSelect.selectedIndex;
+    currentUser = userSelect.options[selectedIndex].value;
+
 });
 
 unitToevoegenButton.addEventListener("click", function () {
@@ -228,11 +245,8 @@ closeButtonNewUnitScreen.addEventListener("click", function () {
 
 //----------------------some functions-------------------------
 
-async function runBarCode() {
-    // Korte pauze van 250 milliseconden (kwart seconde)
-    await new Promise((resolve) => setTimeout(resolve, 250));
+async function runBarCode(scannedCode) {
 
-    const scannedCode = barcodeInputElement.value;
     console.log(`Barcode scanned: ${scannedCode}`);
 
     runLoadingScreen("Controleren of unit bekend is...");
@@ -241,28 +255,24 @@ async function runBarCode() {
         // Krijg de index van het het voorraad select input veld
         const selectedIndex = voorraadSelect.selectedIndex;
         console.log(`Controleren of unit bekend is...`);
-        if (scannedCode.length > 0) {
-            if (selectedIndex > 0) {
-                currentVoorraadArtikel = await getVoorraadArtikel(scannedCode);
 
-                if (currentVoorraadArtikel != null) {
-                    runLoadingScreen("Item wordt aan voorraad toegevoegd");
-                    addUnitToSelectedVoorraad(
-                        scannedCode,
-                        currentVoorraadArtikel,
-                        selectedIndex
-                    );
-                } else {
-                    stopLoadingScreen();
-                    runNewUnitScreen();
-                }
+        if (selectedIndex > 0) {
+            currentVoorraadArtikel = await getVoorraadArtikel(scannedCode);
+
+            if (currentVoorraadArtikel != null) {
+                runLoadingScreen("Item wordt aan voorraad toegevoegd");
+                addUnitToSelectedVoorraad(scannedCode, currentVoorraadArtikel, selectedIndex);
             } else {
                 stopLoadingScreen();
-                console.log("Geannulleerd. Geen voorraad geselecteerd");
-                barcodeInputElement.value = "";
-                runErrorMessage("Geen voorraad geselecteerd");
+                runNewUnitScreen();
             }
+        } else {
+            stopLoadingScreen();
+            console.log("Geannulleerd. Geen voorraad geselecteerd");
+            barcodeInputElement.value = "";
+            runErrorMessage("Geen voorraad geselecteerd");
         }
+
     } else {
         barcodeInputElement.value = "";
         runErrorMessage(`EAN code: <strong>${scannedCode}</strong> is ongeldig`);
@@ -270,18 +280,17 @@ async function runBarCode() {
 }
 
 async function getVoorraadArtikel(scannedCode) {
-    const EANCodeCustomFieldId = "7bb86afc-301a-48ec-b618-a71b2afb6ebd";
     console.log(`Current scannedCode: ${scannedCode}`);
 
     for (let i = 0; i < voorraadArtikelArray.length; i++) {
         let EANCode = voorraadArtikelArray[i].s7f8cdc560;
-        console.log(`current code: ${EANCode}`);
+        console.log(`current evaluated code: ${EANCode}`);
 
         if (EANCode == scannedCode) {
             return voorraadArtikelArray[i];
         }
     }
-    console.log(`returned null`);
+    console.log(`no corresponding EAN codes in database`);
     return null;
 }
 
@@ -336,11 +345,7 @@ function addItemToUnitClassList(unitCode, unitName, unitLabel) {
         });
 }
 
-function addUnitToSelectedVoorraad(
-    scannedCode,
-    currentVoorraadArtikel,
-    selectedIndex
-) {
+function addUnitToSelectedVoorraad(scannedCode, currentVoorraadArtikel, selectedIndex) {
     // Krijg de key / value pair van geselecteerde optie
     const selectedOption = voorraadSelect.options[selectedIndex];
     // Krijg de waarde van het geselecteerde item
@@ -350,11 +355,28 @@ function addUnitToSelectedVoorraad(
     };
 
     console.log(
-        `Unit is bekend: ${currentVoorraadArtikel.name}. Unit wordt toegevoegd aan ${selectedVoorraad.name}...`
+        `Unit is bekend: ${currentVoorraadArtikel.name}. Unit wordt toegevoegd aan ${currentVoorraad.title}...`
     );
 
     const voorraadArtikelTitle = currentVoorraadArtikel.title;
     const voorraadArtikelId = currentVoorraadArtikel.id;
+
+    let reqBody = {};
+
+    if (currentVoorraad.sad8d17120 /*uitboekmethode*/ == '793b08e9-f7e9-44f2-8f00-2186c64295d2' /*op naam*/) {
+        reqBody = {
+            's7d333c5b8': [voorraadArtikelId],
+            's8e6e6b6a7': [currentVoorraad.id],
+            's2e33fcd11' /*item eigenaar*/ : [currentUser.id]
+        }
+    } else if (currentVoorraad.sad8d17120 /*uitboekmethode*/ == 'a8688371-2737-4a0f-8359-5fd6b788234c' /*op klus*/) {
+        reqBody = {
+            's7d333c5b8': [voorraadArtikelId],
+            's8e6e6b6a7': [currentVoorraad.id]
+        }
+    } else {
+        throw new Error('Geen inboekmethode bekend');
+    }
 
     // voeg item toe aan juiste clickup voorraad lijst
 
@@ -368,23 +390,18 @@ function addUnitToSelectedVoorraad(
         method: "POST",
         headers: {
             "Account-Id": accountId,
-            Authorization: smartsuiteApiKey,
-            "Content-Type": "application/json",
+            'Authorization': smartsuiteApiKey,
+            "Content-Type": 'application/json',
         },
-        body: JSON.stringify({
-            s7d333c5b8: [voorraadArtikelId],
-            s8e6e6b6a7: [selectedVoorraad.value],
-        }),
+        body: JSON.stringify(reqBody)
     })
         .then((response) => {
             return response; // Parsen van de response als JSON
         })
         .then((data) => {
+            
             console.log("Successfully added voorraad item:", data);
 
-            console.log(
-                `Unit met id:${data.created_item_id} succesvol toegevoegd aan voorraad`
-            );
             barcodeInputElement.value = "";
             stopLoadingScreen();
             // Clear barcode input field for new input
