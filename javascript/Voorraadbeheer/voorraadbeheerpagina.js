@@ -92,19 +92,23 @@ async function updateMonteurs() {
         let newUserOption = document.createElement("option");
 
         currentUser = filteredArray[i];
-        userFullName = currentUser.full_name.sys_root;
+        const userFullName = currentUser.full_name.sys_root;
 
         let title;
 
+        console.log(userFullName);
+
         // check if user has name configured and set title to email if not
-        if (length.userFullName > 0) {
+        if (userFullName.length > 0) {
             title = userFullName;
         } else {
-            title = currentUser.email;
+            title = currentUser.email[0];
         }
 
-        newUserOption.value = currentUser; // De waarde van de optie (user object)
-        newUserOption.text = currentUser.title; // De tekst die wordt weergegeven
+        console.log(title);
+
+        newUserOption.value = JSON.stringify(currentUser); // De waarde van de optie (user object)
+        newUserOption.text = title; // De tekst die wordt weergegeven
         // Voeg de nieuwe optie toe aan het select element
         userSelect.appendChild(newUserOption);
     }
@@ -139,12 +143,17 @@ async function addListsToVoorraadInput() {
     // Define voorraad select input
     const voorraadSelect = document.getElementById("voorraad_select");
     const voorraadLijstArray = await getVoorraden();
-    console.log(`Voorraadlijst array: ${voorraadLijstArray}`);
+    console.log("VoorraadlijstArray:");
+    console.log(voorraadLijstArray);
 
     for (let i = 0; i < voorraadLijstArray.length; i++) {
+        console.log('CurrentVoorraad: ', voorraadLijstArray[i]);
         // Maak een nieuwe optie aan
         let newVoorraadOption = document.createElement("option");
-        newVoorraadOption.value = voorraadLijstArray[i]; // De waarde van de optie (voorraad object)
+        console.log('voorraadlijstArray[i] = ', voorraadLijstArray[i]);
+        newVoorraadOption.value = JSON.stringify(voorraadLijstArray[i]); // De waarde van de optie (voorraad object)
+
+        console.log('newVoorraadOption.value = ', newVoorraadOption.value);
         newVoorraadOption.text = voorraadLijstArray[i].title; // De tekst die wordt weergegeven
         // Voeg de nieuwe optie toe aan het select element
         voorraadSelect.appendChild(newVoorraadOption);
@@ -162,17 +171,20 @@ async function getVoorraden() {
         const response = await proxyFetch(url, {
             method: "POST",
             headers: {
-                "Account-Id": accountId, // Deze waarden worden in Init.js geinitialiseerd
-                Authorization: smartsuiteApiKey,
+                'Account-Id': accountId,
+                'Authorization': smartsuiteApiKey,
             },
         });
-
+    
         console.log("Response:", response); // Log the response
+    
+        // Assuming response is already an object with the data you need
+        const data = response; 
 
-        const data = await response;
-        const voorraadArray = data.items;
+        voorraadArray = data.items;
 
         return voorraadArray;
+
     } catch (error) {
         console.error("Error fetching voorraden:", error);
         throw error; // Rethrow the error for handling at a higher level
@@ -197,16 +209,18 @@ barcodeInputElement.addEventListener("input", function (event) {
 voorraadSelect.addEventListener("change", function () {
 
     selectedIndex = voorraadSelect.selectedIndex;
-    currentVoorraad = voorraadSelect.options[selectedIndex].value;
+    currentVoorraad = JSON.parse(voorraadSelect.options[selectedIndex].value);
+
+    console.log('currentVoorraad: ', currentVoorraad);
+
+    console.log(`Voorraad uitboekmethode is: ${currentVoorraad.sad8d17120}`);
 
     // Controleren welke uitboekmethode de voorraad heeft en stel de variabele waarde hiervoor in
-    if (selectedVoorraad.sad8d17120 /*uitboekmethode*/ === "793b08e9-f7e9-44f2-8f00-2186c64295d2" /*op naam*/) {
+    if (currentVoorraad.sad8d17120 /*uitboekmethode*/ === "793b08e9-f7e9-44f2-8f00-2186c64295d2" /*op naam*/) {
         // Als het overeenkomt, weergeef het andere select element
         document.getElementById("eigenaar_select").style.display = "block"; // show userSelect
-        uitboekMethode = 'op naam';
-    } else if (selectedVoorraad.sad8d17120 /*uitboekmethode*/ === "a8688371-2737-4a0f-8359-5fd6b788234c" /*op klus*/) {
+    } else if (currentVoorraad.sad8d17120 /*uitboekmethode*/ === "a8688371-2737-4a0f-8359-5fd6b788234c" /*op klus*/) {
         // Verberg het userSelect element als het niet overeenkomt
-        uitboekMethode = 'op klus';
         document.getElementById("eigenaar_select").style.display = "none"; // hide userSelect
     }
 });
@@ -399,7 +413,7 @@ function addUnitToSelectedVoorraad(scannedCode, currentVoorraadArtikel, selected
             return response; // Parsen van de response als JSON
         })
         .then((data) => {
-            
+
             console.log("Successfully added voorraad item:", data);
 
             barcodeInputElement.value = "";
