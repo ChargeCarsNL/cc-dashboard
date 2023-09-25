@@ -7,7 +7,7 @@ newUnitScreen.style.display = "none";
 let newUnitTextInput = document.getElementById("new_unit_text_input");
 let voorraadSelect = document.getElementById("voorraad_select");
 let userSelect = document.getElementById("eigenaar_select");
-let unitLabelSelect = document.getElementById("unit_label_select");
+let artikelSoortSelect = document.getElementById("unit_label_select");
 
 // Haal het barcode input element op
 let barcodeInputElement = document.getElementById("barcode_scanner_input");
@@ -33,6 +33,7 @@ window.addEventListener("load", function () {
 
     updateVoorraadArtikelen();
     addListsToVoorraadInput();
+    updateArtikelSoortOpties();
     updateMonteurs();
     focusBarcodeInput();
     stopLoadingScreen();
@@ -77,6 +78,46 @@ async function updateVoorraadArtikelen() {
     }
 }
 
+async function updateArtikelSoortOpties() {
+    const url = `https://app.smartsuite.com/api/v1/applications/6500ca1af3bd5b04b06af801/`;
+    try {
+        const response = await proxyFetch(url, {
+            method: "GET",
+            headers: {
+                "Account-Id": accountId,
+                'Authorization': smartsuiteApiKey,
+            }
+        });
+
+        console.log("Artikel veld opsomming:", response); // Log de response
+
+        const data = await response; // Parsen van de response als JSON
+
+        voorraadSoortOptionsObject = data.structure.find(obj => obj.slug === 's0bd2eaa09' /*soortartikel*/ );
+        voorraadArtikelArray = voorraadSoortOptionsObject.params.choices;
+
+        // add artikelsoorten to select field
+        for (let i = 0; i < voorraadArtikelArray.length; i++) {
+            // Maak een nieuwe optie aan
+            let newArtikelSoortOption = document.createElement("option");
+
+            currentArtikelSoort = voorraadArtikelArray[i];
+            
+            const artikelSoortValue = currentArtikelSoort.value;
+            const artikelSoortLabel = currentArtikelSoort.label;
+
+            newArtikelSoortOption.value = artikelSoortValue; // De waarde van de optie
+            newArtikelSoortOption.text = artikelSoortLabel; // De tekst die wordt weergegeven
+            // Voeg de nieuwe optie toe aan het select element
+            artikelSoortSelect.appendChild(newArtikelSoortOption);
+        }
+
+    } catch (error) {
+        console.error("Error fetching artikelSoorten:", error);
+        throw error; // Herwerp de error voor behandeling op een hoger niveau
+    }
+}
+
 async function updateMonteurs() {
 
     // get users from database
@@ -96,16 +137,12 @@ async function updateMonteurs() {
 
         let title;
 
-        console.log(userFullName);
-
         // check if user has name configured and set title to email if not
         if (userFullName.length > 0) {
             title = userFullName;
         } else {
             title = currentUser.email[0];
         }
-
-        console.log(title);
 
         newUserOption.value = JSON.stringify(currentUser); // De waarde van de optie (user object)
         newUserOption.text = title; // De tekst die wordt weergegeven
@@ -160,8 +197,6 @@ async function addListsToVoorraadInput() {
     }
 }
 
-// verkrijg alle monteurs
-
 // Verkrijg alle voorraden via api
 async function getVoorraden() {
     const voorradenAppId = "650a2861377fce85c34dbead";
@@ -175,11 +210,11 @@ async function getVoorraden() {
                 'Authorization': smartsuiteApiKey,
             },
         });
-    
+
         console.log("Response:", response); // Log the response
-    
+
         // Assuming response is already an object with the data you need
-        const data = response; 
+        const data = response;
 
         voorraadArray = data.items;
 
@@ -229,7 +264,7 @@ voorraadSelect.addEventListener("change", function () {
 userSelect.addEventListener('change', function () {
 
     selectedIndex = userSelect.selectedIndex;
-    currentUser = userSelect.options[selectedIndex].value;
+    currentUser = JSON.parse(userSelect.options[selectedIndex].value);
 
 });
 
@@ -237,18 +272,22 @@ unitToevoegenButton.addEventListener("click", function () {
     runLoadingScreen("Unit toevoegen aan database");
     // add filled unit to clickup list
 
-    const scannedCode = barcodeInputElement.value;
-    const filledValue = newUnitTextInput.value;
-    const selectedLabel = unitLabelSelect.value;
+    const eanCode = barcodeInputElement.value;
+    const artikelName = newUnitTextInput.value;
+    const artikelSoort = artikelSoortSelect.value;
 
-    if (filledValue.length > 0) {
-        stopNewUnitScreen();
-        addItemToUnitClassList(scannedCode, filledValue, selectedLabel);
+    if (artikelName.length === 0) {
+        runErrorMessage('Artikelnaam is niet ingevuld.');
+        console.error('Error:', 'Artikelnaam is niet ingevuld.');
+    } else if (eanCode.length === 0) {
+        runErrorMessage('Gescande code is niet ingevuld.');
+        console.error('Error:', 'Gescande code is niet ingevuld.');
+    } else if (artikelSoort === 0) {
+        runErrorMessage('Artikelsoort is niet geselecteerd.');
+        console.error('Error:', 'Artikelsoort is niet geselecteerd.');
     } else {
-        barcodeInputElement.value = "";
-        stopLoadingScreen();
-        runErrorMessage(`Geen waarde opgegeven`);
-        console.error("Error:", "Geen waarde opgegeven");
+        stopNewUnitScreen();
+        addVoorraadArtikel(eanCode, artikelName, artikelSoort);
     }
 });
 
@@ -308,18 +347,9 @@ async function getVoorraadArtikel(scannedCode) {
     return null;
 }
 
-function getCustomFieldValueById(customFieldArray, customFieldId) {
-    for (const currentField of customFieldArray) {
-        if (currentField.id === customFieldId) {
-            return currentField.value;
-        }
-    }
-    return null; /*Return null if fieldId is not found*/
-}
-
-function addItemToUnitClassList(unitCode, unitName, unitLabel) {
-    const url =
-        "https://prod-209.westeurope.logic.azure.com:443/workflows/3c068e70e83c486da13e0e35c501cb62/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=NgV77-5FgzXRKI9SdLDAC_-F0XQEvCtiCx1tOLqCYjY";
+function addVoorraadArtikel(eanCode, artikelName, artikelSoort) {
+    const url = `https://app.smartsuite.com/api/v1/applications/${artikelenAppId}/records/`;
+    
     console.log(`item met code: ${unitCode} wordt aan lijst toegevoegd`);
 
     fetch(url, {
@@ -328,23 +358,20 @@ function addItemToUnitClassList(unitCode, unitName, unitLabel) {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            unitcode: unitCode,
-            unitname: unitName,
+            "title": artikelName,
+            "s7f8cdc560": eanCode,
+            "s0bd2eaa09": artikelSoort,
+            "s95756d359": true
         }),
     })
         .then((response) => response.json())
         .then((data) => {
-            // Call fetchUnitClassItems to update the unit class items array
-            fetchUnitClassItems();
 
-            // Call fetchUnitSoortLabels to update the unit class labels array
-            fetchUnitSoortLabels();
-
+            updateVoorraadArtikelen();
+            updateArtikelSoortOpties();
             barcodeInputElement.value = "";
             stopLoadingScreen();
-            runSuccesMessage(
-                `<strong>${unitName}</strong> toegevoegd aan bekende units`
-            );
+            runSuccesMessage(`<strong>${unitName}</strong> toegevoegd aan bekende units`);
             console.log(`Unit met id:${data.created_item_id} toegevoegd aan lijst`);
             focusBarcodeInput();
         })
@@ -377,11 +404,13 @@ function addUnitToSelectedVoorraad(scannedCode, currentVoorraadArtikel, selected
 
     let reqBody = {};
 
+    console.log('currentUser.id ', currentUser.id);
+
     if (currentVoorraad.sad8d17120 /*uitboekmethode*/ == '793b08e9-f7e9-44f2-8f00-2186c64295d2' /*op naam*/) {
         reqBody = {
             's7d333c5b8': [voorraadArtikelId],
             's8e6e6b6a7': [currentVoorraad.id],
-            's2e33fcd11' /*item eigenaar*/ : [currentUser.id]
+            's2e33fcd11' /*item eigenaar*/: [currentUser.id]
         }
     } else if (currentVoorraad.sad8d17120 /*uitboekmethode*/ == 'a8688371-2737-4a0f-8359-5fd6b788234c' /*op klus*/) {
         reqBody = {
@@ -509,66 +538,6 @@ function toggleContent() {
         content.innerHTML = "Voorraad inboeken";
         content.style.color = "var(--bricks-color-coeckr)";
     }
-}
-
-// Fetch unit class items
-async function fetchUnitClassItems() {
-    runLoadingScreen();
-
-    const url =
-        "https://prod-22.westeurope.logic.azure.com:443/workflows/d875fde6360c45718337d4c7778500eb/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=_b2nff58zZzzOWefFZSQR1J-ARN7j6IgekgdqCBf1Ek";
-
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        unitClassItemsArray = data.tasks; // Update the unit class items array
-        console.log("Unit class items fetched:", unitClassItemsArray);
-        stopLoadingScreen();
-    } catch (error) {
-        console.error("Error fetching unit class items:", error);
-        stopLoadingScreen();
-    }
-}
-
-async function fetchUnitSoortLabels() {
-    runLoadingScreen();
-
-    const unitClassItemsList = "900401619864";
-    const url = `https://api.clickup.com/api/v2/list/${unitClassItemsList}/field`;
-
-    return proxyFetch(url, {
-        method: "GET",
-        headers: {
-            Authorization: "pk_38199608_RWBKIFPYH9LSP1DAR6ZLNJD2ZQP5IY4T",
-            "Content-Type": "application/json",
-        },
-    })
-        .then((responseData) => {
-            console.log("Response data:", responseData);
-
-            const customFieldId = "da66ae38-b086-437d-bba2-92cb9619c07c";
-            const customField = responseData.fields.find(
-                (field) => field.id === customFieldId
-            );
-
-            if (customField && customField.type === "drop_down") {
-                unitLabelSelect.innerHTML = "";
-
-                const options = customField.type_config.options;
-                for (const option of options) {
-                    let newLabelOption = document.createElement("option");
-                    newLabelOption.value = option.id;
-                    newLabelOption.text = option.name;
-                    unitLabelSelect.appendChild(newLabelOption);
-                }
-            }
-
-            stopLoadingScreen();
-        })
-        .catch((error) => {
-            console.error("Error fetching unit class labels:", error);
-            stopLoadingScreen();
-        });
 }
 
 function focusBarcodeInput() {
