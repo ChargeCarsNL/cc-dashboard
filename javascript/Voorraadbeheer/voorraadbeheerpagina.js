@@ -436,6 +436,7 @@ function addUnitToSelectedVoorraad(scannedCode, currentVoorraadArtikel, selected
     const voorraadArtikelId = currentVoorraadArtikel.id;
 
     let reqBody = {};
+    let toewijzingAanText;
 
     if (currentVoorraad.sad8d17120 /*uitboekmethode*/ == '793b08e9-f7e9-44f2-8f00-2186c64295d2' /*op naam*/) {
         reqBody = {
@@ -443,22 +444,43 @@ function addUnitToSelectedVoorraad(scannedCode, currentVoorraadArtikel, selected
             's8e6e6b6a7': [currentVoorraad.id],
             's2e33fcd11' /*item eigenaar*/: [currentUser.id]
         }
+        toewijzingAanText = currentUser.title;
     } else if (currentVoorraad.sad8d17120 /*uitboekmethode*/ == 'a8688371-2737-4a0f-8359-5fd6b788234c' /*op klus*/) {
         reqBody = {
             's7d333c5b8': [voorraadArtikelId],
             's8e6e6b6a7': [currentVoorraad.id]
         }
+        toewijzingAanText = currentVoorraad.title;
     } else {
         throw new Error('Geen inboekmethode bekend');
     }
 
-    // voeg item toe aan juiste clickup voorraad lijst
+    for (let i = 0; i < aantal; i++) {
+        let currentAantal = i + 1;
+        logToConsole(`(${currentAantal}/${aantal}) ${voorraadArtikelTitle} wordt aan ${toewijzingAanText} toegevoegd`, 'log-regular');
+        let recordAdded = addRecordToPartsTable(reqBody);
+        if (recordAdded) {
+            logToConsole(`(${currentAantal}/${aantal}) ${voorraadArtikelTitle} succesvol toegevoegd aan ${toewijzingAanText}`, 'log-success');
+            runSuccesMessage(`<strong>${voorraadArtikelTitle}</strong> succesvol toegevoegd aan ${toewijzingAanText}`);
+        } else {
+            logToConsole(`(${currentAantal}/${aantal}) ${voorraadArtikelTitle} niet kunnen toevoegen aan ${toewijzingAanText}`, 'log-error');
+            runErrorMessage(`<strong>${voorraadArtikelTitle}</strong> kon niet worden toegevoegd aan ${toewijzingAanText}`);
+        }
+    }
 
+    // Clear barcode input field for new input
+    barcodeInputElement.value = '';       
+
+    focusBarcodeInput();
+    stopLoadingScreen();
+
+}
+
+async function addRecordToPartsTable(reqBody) {
+
+    // voeg item toe aan juiste clickup voorraad lijst
     const voorraadPartsAppId = '64fef647042fa5a6456691c3';
     const url = `https://app.smartsuite.com/api/v1/applications/${voorraadPartsAppId}/records/`;
-
-    logToConsole(`item: ${voorraadArtikelTitle} - ${scannedCode} wordt aan voorraad lijst toegevoegd`, 'log-regular');
-
 
     proxyFetch(url, {
         method: 'POST',
@@ -473,30 +495,14 @@ function addUnitToSelectedVoorraad(scannedCode, currentVoorraadArtikel, selected
             return response; // Parsen van de response als JSON
         })
         .then((data) => {
-
             console.log('Successfully added voorraad item:', data);
-            logToConsole(`${voorraadArtikelTitle} succesvol toegevoegd aan ${currentVoorraad.title}`, 'log-success');
+            return true;
 
-            barcodeInputElement.value = '';
-            stopLoadingScreen();
-            // Clear barcode input field for new input
-            barcodeInputElement.value = '';
-            runSuccesMessage(
-                `<strong>${voorraadArtikelTitle}</strong> succesvol toegevoegd aan ${selectedVoorraad.name}`
-            );
-            focusBarcodeInput();
         })
         .catch((error) => {
             console.error('Error adding voorraad item:', error);
-            logToConsole(`Kon ${voorraadArtikelTitle} niet toevoegen aan ${currentVoorraad.title}`, 'log-error');
-            barcodeInputElement.value = '';
-            stopLoadingScreen();
-            // Clear barcode input field for new input
-            barcodeInputElement.value = '';
-            runErrorMessage(
-                `<strong>${voorraadArtikelTitle}</strong> kon niet worden toegevoegd aan ${selectedVoorraad.name}`
-            );
-            focusBarcodeInput();
+            return false; 
+            
         });
 }
 
@@ -596,4 +602,3 @@ function logToConsole(message, logType) {
     // Insert the log box at the beginning of the log section
     logSection.insertBefore(logBox, logSection.firstChild);
 }
-
