@@ -9,6 +9,7 @@ let voorraadSelect = document.getElementById('voorraad_select');
 let userSelect = document.getElementById('eigenaar_select');
 let artikelSoortSelect = document.getElementById('unit_label_select');
 let barcodeAantalInput = document.getElementById('barcode_aantal_input');
+const toggleSwitch = document.getElementById('toggleSwitch');
 
 // Haal het barcode input element op
 let barcodeInputElement = document.getElementById('barcode_scanner_input');
@@ -245,6 +246,11 @@ barcodeInputElement.addEventListener('input', function (event) {
 
 // Luister naar veranderingen aan het aantal input van de barcode scanner
 barcodeAantalInput.addEventListener('change', function () {
+    focusBarcodeInput();
+});
+
+// Luister naar veranderingen aan het voorraad opnemen / uitboeken switcher
+toggleSwitch.addEventListener('change', function () {
     focusBarcodeInput();
 });
 
