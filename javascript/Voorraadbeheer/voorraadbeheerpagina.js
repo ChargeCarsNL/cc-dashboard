@@ -342,7 +342,7 @@ async function runBarCode(scannedCode) {
 
             if (currentVoorraadArtikel != null) {
                 runLoadingScreen('Item wordt aan voorraad toegevoegd');
-                addUnitToSelectedVoorraad(scannedCode, currentVoorraadArtikel, selectedVoorraadIndex);
+                addUnitToSelectedVoorraad(scannedCode, currentVoorraadArtikel, selectedVoorraadIndex, selectedUserIndex);
             } else {
                 stopLoadingScreen();
                 runNewUnitScreen();
@@ -362,18 +362,14 @@ async function runBarCode(scannedCode) {
 
 async function getVoorraadArtikel(scannedCode) {
 
-    console.log('Artikel array: ', voorraadArtikelArray)
-
     for (let i = 0; i < voorraadArtikelArray.length; i++) {
         let EANCode = voorraadArtikelArray[i].s7f8cdc560;
-        console.log('Current artikel EAN: ', EANCode);
-        console.log('Scanned code: ', scannedCode);
 
         if (EANCode == scannedCode) {
             return voorraadArtikelArray[i];
         }
     }
-    console.log(`no corresponding EAN codes in database`);
+
     logToConsole('Geen vergelijkbaar EAN nummer bekend in database', 'log-regular');
     return null;
 }
@@ -381,7 +377,6 @@ async function getVoorraadArtikel(scannedCode) {
 async function addVoorraadArtikel(eanCode, artikelName, artikelSoort) {
     const url = `https://app.smartsuite.com/api/v1/applications/${artikelenAppId}/records/`;
 
-    console.log(`${artikelName} met code '${eanCode}' wordt aan lijst toegevoegd`);
     logToConsole(`${artikelName} met code '${eanCode}' wordt aan lijst toegevoegd`, 'log-regular');
 
     try {
@@ -419,14 +414,16 @@ async function addVoorraadArtikel(eanCode, artikelName, artikelSoort) {
     }
 }
 
-function addUnitToSelectedVoorraad(scannedCode, currentVoorraadArtikel, selectedIndex) {
+function addUnitToSelectedVoorraad(scannedCode, currentVoorraadArtikel, selectedVoorraadIndex, selectedUserIndex) {
     // Krijg de key / value pair van geselecteerde optie
-    const selectedOption = voorraadSelect.options[selectedIndex];
+    const currentVoorraadOption = voorraadSelect.options[selectedVoorraadIndex];
     // Krijg de waarde van het geselecteerde item
-    const selectedVoorraad = {
-        name: selectedOption.text,
-        value: selectedOption.value,
+    const selectedVoorraadOption = {
+        name: currentVoorraadOption.text,
+        value: currentVoorraadOption.value,
     };
+
+    const userTitle = userSelect.options[selectedUserIndex].text;
 
     const aantal = barcodeAantalInput.value;
 
@@ -444,7 +441,8 @@ function addUnitToSelectedVoorraad(scannedCode, currentVoorraadArtikel, selected
             's8e6e6b6a7': [currentVoorraad.id],
             's2e33fcd11' /*item eigenaar*/: [currentUser.id]
         }
-        toewijzingAanText = currentUser.title;
+        toewijzingAanText = userTitle;
+        
     } else if (currentVoorraad.sad8d17120 /*uitboekmethode*/ == 'a8688371-2737-4a0f-8359-5fd6b788234c' /*op klus*/) {
         reqBody = {
             's7d333c5b8': [voorraadArtikelId],
@@ -495,7 +493,6 @@ async function addRecordToPartsTable(reqBody) {
             return response; // Parsen van de response als JSON
         })
         .then((data) => {
-            console.log('Successfully added voorraad item:', data);
             return true;
 
         })
